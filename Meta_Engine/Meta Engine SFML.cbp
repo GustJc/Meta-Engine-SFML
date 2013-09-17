@@ -48,6 +48,7 @@
 		<Unit filename="include/Tile.h">
 			<Option virtualFolder="Map/" />
 		</Unit>
+		<Unit filename="src/Defines.cpp" />
 		<Unit filename="src/Main.cpp" />
 		<Unit filename="src/Map.cpp">
 			<Option virtualFolder="Map/" />

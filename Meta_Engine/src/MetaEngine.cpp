@@ -32,10 +32,15 @@ sf::RenderWindow& MetaEngine::getWindowReference()
     return mWindow;
 }
 
+sf::Font& MetaEngine::getFont()
+{
+    return mFont;
+}
 
 MetaEngine::MetaEngine() :
 mWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_NAME, sf::Style::Close)
 {
+    mFont.loadFromFile("arial.ttf");
 }
 
 MetaEngine::~MetaEngine()

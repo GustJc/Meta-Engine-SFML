@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
+#include "Defines.h"
 using namespace std;
 Procedural::Procedural()
 {
@@ -28,8 +29,8 @@ void Procedural::makeMap(Map& mMap)
     for(int i = 0; i < n_Salas; ++i)
     {
         Sala s;
-        s.x = (int)(rand() % 40);
-        s.y = (int)(rand() % 30);
+        s.x = (int)(rand() % MAP_WIDTH);
+        s.y = (int)(rand() % MAP_HEIGHT);
         mSalas.push_back(s);
     }
     //Liga salas
@@ -52,7 +53,7 @@ void Procedural::makeMap(Map& mMap)
             {
                 --n_x;
             }
-            if(n_x < 0 || n_x >= 40){
+            if(n_x < 0 || n_x >= MAP_WIDTH){
                 break;
             }
             mMap.setTile(n_x,n_y,0,1);
@@ -68,7 +69,7 @@ void Procedural::makeMap(Map& mMap)
             {
                 --n_y;
             }
-            if(n_y < 0 || n_y >= 30){
+            if(n_y < 0 || n_y >= MAP_HEIGHT){
                 break;
             }
             mMap.setTile(n_x,n_y,0,1);
@@ -89,7 +90,7 @@ void Procedural::makeMap(Map& mMap)
         {
             if(startX+ix < 0){
                 continue;
-            }else if(startX+ix >= 40){
+            }else if(startX+ix >= MAP_WIDTH){
                 break;
             }
             for(int iy = 0, startY = mSalas[i].y-up_w;
@@ -97,7 +98,7 @@ void Procedural::makeMap(Map& mMap)
             {
                 if(startY+iy < 0){
                     continue;
-                } else if(startY+iy >= 30){
+                } else if(startY+iy >= MAP_HEIGHT){
                     break;
                 }
                 mMap.setTile(startX+ix, startY+iy,0,3);
@@ -119,22 +120,25 @@ void Procedural::makeMapMiner(Map& mMap)
     for(int i = 0; i < n_Salas; ++i)
     {
         Miner s;
-        s.x = (int)(rand() % 40);
-        s.y = (int)(rand() % 30);
+        s.x = (int)(rand() % MAP_WIDTH);
+        s.y = (int)(rand() % MAP_HEIGHT);
         s.life = vida_min + (int)(rand() % (vida_max+1));
         mMiner.push_back(s);
         mMap.setTile(mMiner[i].x, mMiner[i].y, 1, 2);
     }
     int dead = 0;
     int life = total_life;
+    int spawn = 0;
     //time step
     while(dead != (int)mMiner.size() && life > 0)
     {
-        life--;
         dead = 0;
         for(int i = 0; i < (int)mMiner.size(); ++i)
         {
             if(mMiner[i].dead){
+
+                mMiner.erase(mMiner.begin()+i);
+                //cout << "Deletado\n";
                 dead++;
                 continue;
             }
@@ -147,42 +151,64 @@ void Procedural::makeMapMiner(Map& mMap)
             int m_x = mMiner[i].x;
             int m_y = mMiner[i].y;
 
-            int randpos = (int)(rand() % 4);
-            switch(randpos)
+            Tile tile = mMap.getTile(m_x, m_y);
+            bool positions_tested[4] = {false, false, false, false};
+            bool checking_pos = true;
+            while(checking_pos)
             {
-            case 0:
-                if(mMap.getTile(m_x-1,m_y).id == 0){
-                    mMap.setTile(m_x-1,m_y,1,3);
-                    mMiner[i].x -= 1;
+                int randpos = (int)(rand() % 4);
+                switch(randpos)
+                {
+                case 0:
+                    m_x += 1;
+                    positions_tested[0] = true;
+                    break;
+                case 1:
+                    m_x -= 1;
+                    positions_tested[1] = true;
+                    break;
+                case 2:
+                    m_y += 1;
+                    positions_tested[2] = true;
+                    break;
+                case 3:
+                    m_y -= 1;
+                    positions_tested[3] = true;
+                    break;
+                default:
+                    mMiner[i].dead = true;
                 }
-                break;
-            case 1:
-                if(mMap.getTile(m_x+1,m_y).id == 0){
-                    mMap.setTile(m_x+1,m_y,1,3);
-                    mMiner[i].x += 1;
+                int count = 0;
+                for(int z = 0; z < 4; ++z){
+                    if(positions_tested[z] == true){
+                        count++;
+                    }
                 }
-                break;
-            case 2:
-                if(mMap.getTile(m_x,m_y-1).id == 0){
-                    mMap.setTile(m_x,m_y-1,1,3);
-                    mMiner[i].y -= 1;
+                if(count >= 4) {
+                    checking_pos = false;
                 }
-                break;
-            case 3:
-                if(mMap.getTile(m_x,m_y+1).id == 0){
-                    mMap.setTile(m_x,m_y+1,1,3);
-                    mMiner[i].y += 1;
+                tile = mMap.getTile(m_x, m_y);
+                if(tile.id == 0) {
+                    checking_pos = false;
                 }
-                break;
-            default:
-                mMiner[i].dead = true;
+
+            }
+
+            if(tile.id == 0){
+                mMap.setTile(m_x,m_y,1,3);
+                life--;
+                mMiner[i].x = m_x;
+                mMiner[i].y = m_y;
+            } else
+            {
+                mMiner.erase(mMiner.begin()+i);
             }
 
             //Chance de criar miner
             double chance = (double)(rand() % 10000);
             if(chance < chance_spawn) //5%
             {
-                cout << "CHANCE SPAWN!" << endl;
+                spawn++;
                 Miner m;
                 m.x = mMiner[i].x;
                 m.y = mMiner[i].y;
@@ -195,6 +221,6 @@ void Procedural::makeMapMiner(Map& mMap)
     if(life < 0){
         cout << "Acabou por tempo." << endl;
     }
+    cout << "Miner criados: " << spawn << endl;
 
 }
-
