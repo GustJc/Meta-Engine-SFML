@@ -9,19 +9,35 @@
 #include <iostream>
 #include <string>
 #include "Defines.h"
-
+#include "LuaManager.h"
 #include "StateGame.h"
+#include "LuaManager.h"
+#include "Entity.h"
+#include "PlayerController.h"
+
 
 using namespace std;
 int GameManager::run(int argc, char* args[])
 {
+
+    LuaManager::LuaControl.loadConfigs("config.lua", MAP_WIDTH, MAP_HEIGHT, TILE_SIZE);
+
+
+    cout << "w=" << MAP_WIDTH << " h=" << MAP_HEIGHT << " ts=" << TILE_SIZE << endl;
+
+
     MetaEngine& en = MetaEngine::EngineControl;
 
     sf::Text t("", en.getFont());
 
 
-
     sf::RenderWindow& window = en.getWindowReference();
+    window.setKeyRepeatEnabled(false);
+
+
+    sf::View view = window.getView();
+    view.setSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+    window.setView(view);
 
     Map myMap;
     myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
@@ -118,9 +134,16 @@ int GameManager::run(int argc, char* args[])
         procedural.makeMapMiner(myMap);
         break;
     }
+//Lua testes
+    LuaManager lMan;
+    lMan.BaseLuaInterpreter();
 
+///Carrega estado inicial
     mEstadoAtual = new StateGame(window);
-
+    Entity player(ENT_PLAYER);
+    player.setPosition(5,5);
+    PlayerController controller;
+    controller.player = &player;
 ///Inicio loop principal
     sf::Clock tempoDecorrido;
     while(window.isOpen()){
@@ -131,7 +154,13 @@ int GameManager::run(int argc, char* args[])
             if(event.type == sf::Event::Closed){
                 window.close();
             }
+            /*
+            if(event.type == sf::Event::KeyPressed){
+                window.close();
+            }
+            */
             mEstadoAtual->events(event);
+            controller.events(event);
         }
         //Update
         switch(mEstadoAtual->update(tempoDecorrido.getElapsedTime().asSeconds() )  )
@@ -149,13 +178,16 @@ int GameManager::run(int argc, char* args[])
         }
         //Limpa a tela
         window.clear();
+        sf::View view = window.getView();
+        view.setCenter(player.getPosition().x*TILE_SIZE-TILE_SIZE/4, player.getPosition().y*TILE_SIZE-TILE_SIZE/4);
+        window.setView(view);
         //Desenha
         mEstadoAtual->render();
-
 
         t.setString("Hellow");
         t.setPosition(10,10);
         myMap.draw();
+        player.draw();
         en.getWindowReference().draw(t);
 
 

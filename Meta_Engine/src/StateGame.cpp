@@ -22,9 +22,7 @@ int StateGame::unload()
 }
 void StateGame::events(sf::Event event)
 {
-    if(event.type == sf::Event::KeyPressed){
-        window.close();
-    }
+
 }
 eStateType StateGame::update(unsigned int dt)
 {

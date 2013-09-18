@@ -1,13 +1,17 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-
+#include <vector>
+#include <memory>
+#include <map>
 typedef enum eStateType {
     GST_GAME,
     GST_MENU,
     GST_QUIT,
     GST_NONE
 } StateType;
+
+#include "Entity.h"
 
 class State
 {
@@ -22,6 +26,8 @@ class State
 
     protected:
         sf::RenderWindow& window;
+        std::vector<std::unique_ptr<Entity>> EntityList;
         int mStack;
+
 };
 
