@@ -13,8 +13,13 @@ class PlayerBot
 
         void startBot(Entity& Player);
 
+        void update(unsigned int dt);
+
     protected:
-        std::vector<std::vector<Tile> > KnowledMap;
+        std::vector<std::vector<int> > KnowledMap;
         Entity* mPlayer;
+        unsigned int mDelay;
+
+        void runAI();
     private:
 };

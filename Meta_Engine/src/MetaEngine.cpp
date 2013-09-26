@@ -1,5 +1,7 @@
 #include "MetaEngine.h"
 #include "Defines.h"
+
+std::vector<Entity*> EntityList;
 MetaEngine MetaEngine::EngineControl;
 void MetaEngine::drawRect(int x, int y, int w, int h, sf::Color color)
 {
@@ -37,13 +39,47 @@ sf::Font& MetaEngine::getFont()
     return mFont;
 }
 
+sf::View& MetaEngine::getViewGame()
+{
+    return mViewGame;
+}
+
 MetaEngine::MetaEngine() :
 mWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_NAME, sf::Style::Close)
 {
     mFont.loadFromFile("arial.ttf");
+
+    mViewGame.setSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+
+    mEventsPaused = false;
+
+    mMapFog = true;
 }
 
 MetaEngine::~MetaEngine()
 {
 
+}
+
+
+//-------- Getters Setters
+
+bool MetaEngine::isEventsPaused()
+{
+    return mEventsPaused;
+}
+
+void MetaEngine::setEventsPaused(bool pause)
+{
+    mEventsPaused = pause;
+}
+
+bool MetaEngine::isMapFog()
+{
+    return mMapFog;
+}
+
+void MetaEngine::setMapFog(bool fog)
+{
+    mMapFog = fog;
 }

@@ -10,11 +10,12 @@
 
 namespace Textures
 {
-    enum ID { Gust, Number, Button };
+    enum ID { Gust, Number, Button, MAP };
 }
 class TextureManager
 {
     public:
+        static TextureManager TextureControl;
         TextureManager();
         virtual ~TextureManager();
 

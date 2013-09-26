@@ -1,8 +1,11 @@
 #pragma once
-
+#include <vector>
+class GameObject;
 enum {
+    TILE_NONE = -1,
     TILE_SOLID,
-    TILE_FLOOR
+    TILE_FLOOR,
+    TILE_FINISH_LV
 };
 enum {
     TILE_OBJ_ENTITY,
@@ -16,7 +19,7 @@ class Tile
         virtual ~Tile();
 
         int id;
-        int obj;
+        std::vector<GameObject*> obj;
         int color;
     protected:
     private:

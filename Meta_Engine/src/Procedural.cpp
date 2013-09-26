@@ -3,13 +3,15 @@
 #include <time.h>
 #include <iostream>
 #include "Defines.h"
+#include "Player.h"
+#include "Entity.h"
 using namespace std;
 Procedural::Procedural()
 {
     //ctor
     srand(time(0));
     n_Salas = 8;
-    min_width = 1;
+    min_width = 3;
     max_width = 3;
 
     vida_min = 5;
@@ -56,7 +58,7 @@ void Procedural::makeMap(Map& mMap)
             if(n_x < 0 || n_x >= MAP_WIDTH){
                 break;
             }
-            mMap.setTile(n_x,n_y,0,1);
+            mMap.setTile(n_x,n_y,TILE_FLOOR,1);
         }
         //Cria caminho em Y
         while(n_y != d_y)
@@ -72,7 +74,7 @@ void Procedural::makeMap(Map& mMap)
             if(n_y < 0 || n_y >= MAP_HEIGHT){
                 break;
             }
-            mMap.setTile(n_x,n_y,0,1);
+            mMap.setTile(n_x,n_y,TILE_FLOOR,1);
         }
 
 
@@ -101,7 +103,7 @@ void Procedural::makeMap(Map& mMap)
                 } else if(startY+iy >= MAP_HEIGHT){
                     break;
                 }
-                mMap.setTile(startX+ix, startY+iy,0,3);
+                mMap.setTile(startX+ix, startY+iy,TILE_FLOOR,3);
             }
         }
     }
@@ -109,8 +111,18 @@ void Procedural::makeMap(Map& mMap)
     //Pinta centro de ponto das salas
     for(unsigned int i = 0; i < mSalas.size();++i)
     {
-        mMap.setTile(mSalas[i].x, mSalas[i].y, 0, 2);
+        if(i == mSalas.size()-1)
+        {
+            mMap.setTile(mSalas[i].x, mSalas[i].y, TILE_FLOOR, 4);
+            mMap.getTile(mSalas[i].x, mSalas[i].y)->id = TILE_FINISH_LV;
+        } else
+        {
+            mMap.setTile(mSalas[i].x, mSalas[i].y, TILE_FLOOR, 2);
+        }
+
     }
+
+    Player::PlayerControl.setPosition(mSalas[0].x, mSalas[0].y);
 
 }
 
@@ -124,7 +136,7 @@ void Procedural::makeMapMiner(Map& mMap)
         s.y = (int)(rand() % MAP_HEIGHT);
         s.life = vida_min + (int)(rand() % (vida_max+1));
         mMiner.push_back(s);
-        mMap.setTile(mMiner[i].x, mMiner[i].y, 1, 2);
+        mMap.setTile(mMiner[i].x, mMiner[i].y, TILE_FLOOR, 2);
     }
     int dead = 0;
     int life = total_life;
@@ -151,7 +163,7 @@ void Procedural::makeMapMiner(Map& mMap)
             int m_x = mMiner[i].x;
             int m_y = mMiner[i].y;
 
-            Tile tile = mMap.getTile(m_x, m_y);
+            Tile* tile = mMap.getTile(m_x, m_y);
             bool positions_tested[4] = {false, false, false, false};
             bool checking_pos = true;
             while(checking_pos)
@@ -188,14 +200,15 @@ void Procedural::makeMapMiner(Map& mMap)
                     checking_pos = false;
                 }
                 tile = mMap.getTile(m_x, m_y);
-                if(tile.id == 0) {
+                //Se for solido, pode cavar
+                if(tile != nullptr && tile->id == TILE_SOLID) {
                     checking_pos = false;
                 }
 
             }
 
-            if(tile.id == 0){
-                mMap.setTile(m_x,m_y,1,3);
+            if(tile != nullptr && tile->id == TILE_SOLID){
+                mMap.setTile(m_x,m_y,TILE_FLOOR,3);
                 life--;
                 mMiner[i].x = m_x;
                 mMiner[i].y = m_y;
@@ -214,7 +227,7 @@ void Procedural::makeMapMiner(Map& mMap)
                 m.y = mMiner[i].y;
                 m.life = vida_min + (int)(rand() % (vida_max+1));
                 mMiner.push_back(m);
-                mMap.setTile(m.x, m.y, 1, 1);
+                mMap.setTile(m.x, m.y, TILE_FLOOR, 1);
             }
         } //fim iterar vida
     } //fim loop

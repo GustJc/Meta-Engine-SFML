@@ -1,6 +1,9 @@
 #pragma once
-#include <lua5.2/lua.hpp>
+#include <lua5.1/lua.hpp>
+#include <luabind/luabind.hpp>
 #include <string>
+
+
 class LuaManager
 {
     public:
@@ -9,11 +12,14 @@ class LuaManager
 
         static LuaManager LuaControl;
 
+        void startLua();
+        void doFile(const char* filename);
+
         void loadConfigs(std::string filename, int& width, int& height, int& tile);
 
-        int BaseLuaInterpreter();
-        int BaseLuaInterpreter2();
+        void ReportLuaError(lua_State* luaState);
     protected:
         lua_State* L;
     private:
+        luabind::scope bindClasses();
 };

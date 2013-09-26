@@ -20,7 +20,7 @@ class State
         virtual int unload() = 0;
         virtual eStateType update(unsigned int dt) = 0;
         virtual void render() = 0;
-        virtual void events(sf::Event event) = 0;
+        virtual void events(sf::Event& event) = 0;
         virtual ~State(){};
         State(sf::RenderWindow& wnd) : window(wnd){mStack = 0;};
 

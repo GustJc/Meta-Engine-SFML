@@ -1,6 +1,8 @@
 #include <memory>
 #include <stdexcept>
 #include <cassert>
+#include <iostream>
+using namespace std;
 
 #define WINDOW_WIDTH    640
 #define WINDOW_HEIGHT   480

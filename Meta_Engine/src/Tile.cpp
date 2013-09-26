@@ -3,8 +3,9 @@
 Tile::Tile()
 {
     //ctor
-    id = 0;
+    id = TILE_SOLID;
     color = 0;
+    obj.clear();
 }
 
 Tile::~Tile()

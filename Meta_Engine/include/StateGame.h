@@ -9,7 +9,7 @@ class StateGame : public State
         void load(int stack = 0);
         int unload();
         eStateType update(unsigned int dt);
-        void events(sf::Event event);
+        void events(sf::Event& event);
         void render();
     protected:
     private:

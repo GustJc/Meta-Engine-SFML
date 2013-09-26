@@ -13,33 +13,28 @@
 #include "StateGame.h"
 #include "LuaManager.h"
 #include "Entity.h"
-#include "PlayerController.h"
-
+#include "Player.h"
+#include "ConsoleInfo.h"
 
 using namespace std;
 int GameManager::run(int argc, char* args[])
 {
-
     LuaManager::LuaControl.loadConfigs("config.lua", MAP_WIDTH, MAP_HEIGHT, TILE_SIZE);
 
-
     cout << "w=" << MAP_WIDTH << " h=" << MAP_HEIGHT << " ts=" << TILE_SIZE << endl;
-
 
     MetaEngine& en = MetaEngine::EngineControl;
 
     sf::Text t("", en.getFont());
 
-
     sf::RenderWindow& window = en.getWindowReference();
     window.setKeyRepeatEnabled(false);
 
-
-    sf::View view = window.getView();
+    sf::View& view = en.getViewGame();
     view.setSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
     window.setView(view);
 
-    Map myMap;
+    Map& myMap = Map::MapControl;
     myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
     //myMap.setTile(0,0,0,1);
     //myMap.setTile(39,0,0,1);
@@ -134,17 +129,30 @@ int GameManager::run(int argc, char* args[])
         procedural.makeMapMiner(myMap);
         break;
     }
-//Lua testes
-    LuaManager lMan;
-    lMan.BaseLuaInterpreter();
 
-///Carrega estado inicial
+
+
+    LuaManager::LuaControl.startLua();
+
+// - - - - - - - - - - - Carrega estado inicial - - - - - - - - - - - -
     mEstadoAtual = new StateGame(window);
-    Entity player(ENT_PLAYER);
-    player.setPosition(5,5);
-    PlayerController controller;
-    controller.player = &player;
-///Inicio loop principal
+    mEstadoAtual->load();
+
+    ConsoleInfo::MessageControl.init();
+
+    Player::PlayerControl.startController();
+
+
+    Entity enTest(ENT_ENEMY);
+    //As vezes cria fora do map e erro de seg
+    enTest.setPosition(Player::PlayerControl.getPosition().x+2, Player::PlayerControl.getPosition().y+1);
+    enTest.movePosition(0,0);
+    enTest.mSpeed = 200;
+    enTest.geraRota(Player::PlayerControl.getPosition().x, Player::PlayerControl.getPosition().y);
+
+
+
+// - - - - - - - - - - - Loop Principal - - - - - - - - - - - - - - - -
     sf::Clock tempoDecorrido;
     while(window.isOpen()){
 
@@ -160,10 +168,11 @@ int GameManager::run(int argc, char* args[])
             }
             */
             mEstadoAtual->events(event);
-            controller.events(event);
         }
+        unsigned int dt = tempoDecorrido.getElapsedTime().asMilliseconds();
+        tempoDecorrido.restart();
         //Update
-        switch(mEstadoAtual->update(tempoDecorrido.getElapsedTime().asSeconds() )  )
+        switch(mEstadoAtual->update(dt )  )
         {
         case GST_QUIT:
             mEstadoAtual->unload();
@@ -176,20 +185,28 @@ int GameManager::run(int argc, char* args[])
         default:
             break;
         }
+        if(Player::PlayerControl.mHasMoved)
+        {
+            enTest.update(0, Player::PlayerControl.mSpeed);
+        }
+
         //Limpa a tela
         window.clear();
-        sf::View view = window.getView();
-        view.setCenter(player.getPosition().x*TILE_SIZE-TILE_SIZE/4, player.getPosition().y*TILE_SIZE-TILE_SIZE/4);
+        sf::View& view = en.getViewGame();
+        view.setCenter(Player::PlayerControl.getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl.getPosition().y*TILE_SIZE-TILE_SIZE/4);
+        //view.setViewport(sf::FloatRect(0,0.2f, 1,1));
         window.setView(view);
         //Desenha
-        mEstadoAtual->render();
+
 
         t.setString("Hellow");
         t.setPosition(10,10);
         myMap.draw();
-        player.draw();
+        enTest.draw();
+        Player::PlayerControl.draw();
         en.getWindowReference().draw(t);
 
+        mEstadoAtual->render();
 
 /*
         sf::Clock time1;
@@ -217,10 +234,14 @@ GameManager::GameManager()
 {
     //ctor
     stack = 0;
-    mEstadoAtual = NULL;
+    mEstadoAtual = nullptr;
 }
 
 GameManager::~GameManager()
 {
+    if(mEstadoAtual == nullptr)
+    {
+        delete mEstadoAtual;
+    }
     //dtor
 }

@@ -1,0 +1,12 @@
+
+
+
+   Criar algoritmo de exploração
+   
+   Sistema de itens
+   
+   Voltar a uma tela principal ao finalizar o jogo.
+   
+   Mostra visibilidade somente em volta do jogador.
+   
+   Bot usa visibilidade para mover-se
