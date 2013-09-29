@@ -59,6 +59,8 @@ void LuaManager::startLua()
     if(error != 0)
         ReportLuaError(L);
 
+    //doFile("./testes.lua");
+
 }
 
 luabind::scope LuaManager::bindClasses()
@@ -68,7 +70,10 @@ luabind::scope LuaManager::bindClasses()
         .def( luabind::constructor<>( ) )
 	   .property("h", &Map::getMapHeight)
 	   .property("w", &Map::getMapWidth)
+	   .def("forceShowMap", &Map::forceShowMap)
+	   .def("getObj", &Map::getObj)
 	   .def("getTile", &Map::getTile)
+	   .def("setTile", &Map::setTile)
 	   .def("has_seens", &Map::has_seens)
 	   .def("has_passed", &Map::has_passed)
 	   .def("has_remembers", &Map::has_remembers)
@@ -87,13 +92,24 @@ luabind::scope LuaManager::bindClasses()
         .def_readwrite("x", &sf::Vector2i::x)
         .def_readwrite("y", &sf::Vector2i::y),
 
-    luabind::class_<GameObject>("GameObject")
+    luabind::class_<GameObject>("Obj")
         .def( luabind::constructor<>( ) )
         .property("x", &GameObject::getPositionX)
         .property("y", &GameObject::getPositionY)
+        .def_readwrite("type", &GameObject::type)
         .def("getPos", &GameObject::getPosition )
         .def("setPos", (void (GameObject::*)(int, int))&GameObject::setPosition )
-        .def("setPos", (void (GameObject::*)(sf::Vector2i))&GameObject::setPosition ),
+        .def("setPos", (void (GameObject::*)(sf::Vector2i))&GameObject::setPosition )
+        .enum_("Obj_type")
+        [
+            luabind::value("ENEMY", TYPE_ENEMY),
+            luabind::value("PLAYER", TYPE_PLAYER),
+            luabind::value("ITEM", TYPE_ITEM),
+            luabind::value("TRAP", TYPE_TRAP),
+            luabind::value("DESTROYABLE", TYPE_DESTROYABRE)
+        ]
+
+        ,
 
     luabind::class_<Entity, GameObject>("Entity")
         .def( luabind::constructor<>( ) )
@@ -133,6 +149,11 @@ void LuaManager::doFile(const char* filename)
     {
         ReportLuaError(L);
     }
+}
+
+void LuaManager::doFunctionInFile(const char* functionName)
+{
+    luabind::call_function<int>(L, functionName);
 }
 
 

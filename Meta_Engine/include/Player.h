@@ -13,6 +13,7 @@ class Player : public Entity
         Player();
         virtual ~Player();
 
+        void draw();
         void update(unsigned int dt = 0);
         void events(sf::Event& event);
         void startController();
@@ -22,6 +23,8 @@ class Player : public Entity
 
         bool mHasMoved;
         bool isBot;
+
+        int mGold;
     protected:
         void runBotAI();
 

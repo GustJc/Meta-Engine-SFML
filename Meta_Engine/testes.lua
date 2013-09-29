@@ -1,3 +1,13 @@
+local function toSingle(x, y)
+	return x + y * map.w
+end
+
+local function toDouble(c)
+	local y = math.floor(c / map.w)
+	return c - y * map.w, y
+end
+
+
 -- Lista tiles adjacentes
 
 local function listAdjacentTiles(target_x, target_y, no_diagonal, no_cardinal)
@@ -147,7 +157,7 @@ local adjacentTiles = {
 
 		  if x > 0 and isOpenTiles(x-1,y-1) then diagonal_tiles[#diagonal_tiles+1]                    = {x - 1, y - 1, 7 } end
 		  if isOpenTiles(x,y-1) then cardinal_tiles[#cardinal_tiles+1]                                  = {x,     y - 1, 8 } end
-		  if x < map.w - 1 and isOpenTiles(x+1,y-11) then diagonal_tiles[#diagonal_tiles+1]            = {x + 1, y - 1, 9 } end
+		  if x < map.w - 1 and isOpenTiles(x+1,y-1) then diagonal_tiles[#diagonal_tiles+1]            = {x + 1, y - 1, 9 } end
 	  end,
 	  -- Dir 9
 	  function(target_x, target_y, cardinal_tiles, diagonal_tiles)
@@ -173,7 +183,7 @@ local adjacentTiles = {
 function isOpenTiles(target_x, target_y)
   --print("doing " .. target_x ..','..target_y)
   local tile = map:getTile(target_x,target_y)
-  if openTiles[target_x+1][target_y+1] == false and tile.id ~= 0 then
+  if openTiles[target_x+1][target_y+1] == false and tile.id > 0  then
     openTiles[target_x+1][target_y+1] = true
     return true
   end
@@ -192,85 +202,149 @@ function clearOpenTiles()
 
 end
 
-function autoExploreOld()
-    local moved = false
-    for _, node in ipairs(listAdjacentTiles(player.x, player.y,false, false)) do
-      local tile = map:getTile(node[1], node[2])
-      -- Se puder andar no tile, puder ver, e não tiver passado
-      
-      if tile.id ~= 0 and map:has_seens(node[1], node[2]) and map:has_passed(node[1], node[2]) == false then 
-        print('movendo ' .. node[1] .. ',' .. node[2] .. ' para ' .. node[3])
-        player:move(node[3])
-        moved = true
-        break
-      end
-    end
-    if moved == false then
-      local dir = math.random(8)
-      if(dir == 5) then 
-        dir = dir+1
-      end
-      player:move(dir);
-    end
-end
-
 function autoExplore()
+  local running = true
+  local iter = 1;
+  local node = { player.x, player.y, 5 }
+  local current_tiles = { node }
+--new
+	local values = {}
+  local unseen_tiles = {}
+	local unseen_singlets = {}
+	local unseen_items = {}
+	local exits = {}
+	local minval = 999999999999999
+	local minval_items = 999999999999999
+-- parametros
+	local extra_iters = 5     -- numero de iterações exras depois de achar um item ou tile não visto
+	local singlet_greed = 5   -- numero de passos disposto a se mover para explorar um tile solitario
+	local item_greed = 5      -- numero de passos disposto a se mover para pegar um item ao inves de explorar um tiel
+  
+  while running do
+    local cardinal_tiles = {}
+    local diagonal_tiles = {}	
+    local current_tiles_next = {}
 
-
+    for _, node in ipairs(current_tiles) do
+			    adjacentTiles[node[3]](node[1],node[2], cardinal_tiles, diagonal_tiles)
+			    --print(_)
+    end
+    
+    os.execute("sleep 0.5")
+    map:forceShowMap()
+  
+    --Cria um mapa de distancia para achar tiles não vistos e itens não vistos
+    for id_Tipes, tile_list in ipairs({cardinal_tiles, diagonal_tiles}) do
+        for id_Tile, node in ipairs(tile_list) do
+            local x = node[1]
+            local y = node[2]
+            local c = toSingle(x,y)
+            local from = node[3]
+            
+            if id_Tile > 2000 then
+             print('2000 PLUS')
+             break 
+            end
+            
+            local tile = map:getTile(x,y)    
+            if map:has_seens(x,y) then
+              map:setTile(x,y,-1,5)
+            else
+              map:setTile(x,y,-1,6)
+            end
+            
+            --Se não estiver na lista de iterados
+            if not values[c] then
+              if not map:has_seens(x, y) then
+						    unseen_tiles[#unseen_tiles + 1] = c
+						    values[c] = iter
+						    if iter < minval then
+							    minval = iter
+						    end
+                -- Tenta não abandonar tiles solitarios
+						    local is_singlet = true
+						    for _, anode in ipairs(listAdjacentTiles(x,y)) do
+							    if not map:has_seens(anode[1], anode[2]) then
+								    is_singlet = false
+								    break
+							    end
+						    end
+						    if is_singlet then
+							    unseen_singlets[#unseen_singlets + 1] = c
+							    map:setTile(x,y,-1,7)
+							    print("singlet")
+						    end
+						  else --Se já tile visto, propaga para proxima iteração
+						    if tile.id ~= 0 then
+                  current_tiles_next[#current_tiles_next+1] = node
+                end
+                
+                local obj = map:getObj(x, y, 0)
+						    if obj and not obj.type == Obj.ENEMY then
+							    unseen_items[#unseen_items + 1] = c
+							    values[c] = iter
+							    if iter < minval_items then
+								    minval_items = iter
+							    end
+						    end
+ 						  end  --fim else
+					  end  --fim values
+					  
+					end--endloop
+				end--endloop
+			
+			
+			--Continua se não encontrar itens ou tiles
+			running = #unseen_tiles == 0 and #unseen_items == 0
+			--Para se não houver mais tiles
+			running = running and #current_tiles_next > 0
+			--Itera mais vezes apos encontrar itens 
+			if not running and extra_iters > 0 then
+			  running = true
+			  extra_iters = extra_iters - 1
+		  end
+			
+	    current_tiles = current_tiles_next	    
+      iter = iter + 1			
+  end -- fim running
+  
+  --Escolhe alvo
+  if #unseen_tiles > 0 or #unseen_items > 0 then
+    local choices = {}
+		local distances = {}
+		local mindist = 999999999999999
+		-- Tenta não deixar tiles sozinhos
+		for _, c in ipairs(unseen_singlets) do
+		  local x, y = toDouble(c)
+		  map:setTile(x,y, -1, 6+values[c])
+		  os.execute("sleep 0.3")
+      map:forceShowMap()
+      
+			if values[c] <= minval + singlet_greed then
+				choices[#choices + 1] = c
+				local dist = values[c]
+				distances[c] = dist
+				if dist < mindist then
+					mindist = dist
+				end
+			end
+		end -- for Singlets
+		--Pesquisa tiles
+		for _, c in ipairs(unseen_tiles) do
+		  local x, y = toDouble(c)
+		  map:setTile(x,y, -1, 6+values[c])
+		  os.execute("sleep 0.3")
+      map:forceShowMap()
+		end -- for Tiles
+		
+  end -- if has_seens
+  
 end
+
+
+
+clearOpenTiles()
 
 autoExplore()
 
---[[
-clearOpenTiles()
 
-running = true
-iter = 1;
-node = { player.x, player.y, 5 }
-print('player, ' .. player.x ..',' .. player.y)
-current_tiles = { node }
-while running do
-  local cardinal_tiles = {}
-  local diagonal_tiles = {}	
-  local current_tiles_next = {}
-
-  for _, node in ipairs(current_tiles) do
-			  adjacentTiles[node[3] ](node[1],node[2], cardinal_tiles, diagonal_tiles)
-			  --print(_)
-  end
-  
-  --os.execute("sleep 0.8")
-  --map:forceShowMap()
-
-  for id_Tipes, tile_list in ipairs({cardinal_tiles, diagonal_tiles}) do
-  
-      for id_Tile, node in ipairs(tile_list) do
-          local x = node[1]
-          local y = node[2]
-          local from = node[3]
-          --print('pos['.. id_Tipes .. ',' .. id_Tile .. '] is: ' .. x .. ',' .. y .. ' number: ' .. from)
-          local tile = map:getTile(x,y)
-          --if(tile) then print('tileID = ' .. tile.id) end
-            map:setTile(x,y,1,1)
-          if tile.id ~= 0 then
-            current_tiles_next[#current_tiles_next+1] = node
-          end
-          if id_Tile > 2000 then
-           print('2000 PLUS')
-           break 
-          end
-          
-      end
-  end
-  
-  iter = iter + 1
-  if iter > 7 then 
-    print('Breaking')
-    break 
-  end
-  
-  running = running and #current_tiles_next > 0
-	current_tiles = current_tiles_next
-end
-
---]]

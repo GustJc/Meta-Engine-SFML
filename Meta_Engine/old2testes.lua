@@ -173,7 +173,7 @@ local adjacentTiles = {
 function isOpenTiles(target_x, target_y)
   --print("doing " .. target_x ..','..target_y)
   local tile = map:getTile(target_x,target_y)
-  if openTiles[target_x+1][target_y+1] == false and tile.id ~= 0 then
+  if openTiles[target_x+1][target_y+1] == false and tile.id > 0  then
     openTiles[target_x+1][target_y+1] = true
     return true
   end
@@ -192,85 +192,65 @@ function clearOpenTiles()
 
 end
 
-function autoExploreOld()
-    local moved = false
-    for _, node in ipairs(listAdjacentTiles(player.x, player.y,false, false)) do
-      local tile = map:getTile(node[1], node[2])
-      -- Se puder andar no tile, puder ver, e não tiver passado
-      
-      if tile.id ~= 0 and map:has_seens(node[1], node[2]) and map:has_passed(node[1], node[2]) == false then 
-        print('movendo ' .. node[1] .. ',' .. node[2] .. ' para ' .. node[3])
-        player:move(node[3])
-        moved = true
-        break
-      end
-    end
-    if moved == false then
-      local dir = math.random(8)
-      if(dir == 5) then 
-        dir = dir+1
-      end
-      player:move(dir);
-    end
-end
-
 function autoExplore()
+  running = true
+  iter = 1;
+  node = { player.x, player.y, 5 }
+  print('player, ' .. player.x ..',' .. player.y)
+  current_tiles = { node }
+  while running do
+    local cardinal_tiles = {}
+    local diagonal_tiles = {}	
+    local current_tiles_next = {}
 
+    for _, node in ipairs(current_tiles) do
+			    adjacentTiles[node[3]](node[1],node[2], cardinal_tiles, diagonal_tiles)
+			    --print(_)
+    end
+    
+    os.execute("sleep 0.8")
+    map:forceShowMap()
 
+    for id_Tipes, tile_list in ipairs({cardinal_tiles, diagonal_tiles}) do
+    
+        for id_Tile, node in ipairs(tile_list) do
+            local x = node[1]
+            local y = node[2]
+            local from = node[3]
+            --print('pos['.. id_Tipes .. ',' .. id_Tile .. '] is: ' .. x .. ',' .. y .. ' number: ' .. from)
+            local tile = map:getTile(x,y)
+            --if(tile) then print('tileID = ' .. tile.id) end
+              
+            if map:has_seens(x,y) then
+              map:setTile(x,y,-1,5)
+            else
+              map:setTile(x,y,-1,6)
+            end
+            if tile.id ~= 0 and map:has_seens(x,y) then
+              current_tiles_next[#current_tiles_next+1] = node
+            end
+            if id_Tile > 2000 then
+             print('2000 PLUS')
+             break 
+            end
+            
+        end
+    end
+    
+    iter = iter + 1
+    if iter > 7 then 
+      print('Breaking')
+      break 
+    end
+    
+    running = running and #current_tiles_next > 0
+	  current_tiles = current_tiles_next
+  end
+  
 end
 
-autoExplore()
 
---[[
+
 clearOpenTiles()
 
-running = true
-iter = 1;
-node = { player.x, player.y, 5 }
-print('player, ' .. player.x ..',' .. player.y)
-current_tiles = { node }
-while running do
-  local cardinal_tiles = {}
-  local diagonal_tiles = {}	
-  local current_tiles_next = {}
-
-  for _, node in ipairs(current_tiles) do
-			  adjacentTiles[node[3] ](node[1],node[2], cardinal_tiles, diagonal_tiles)
-			  --print(_)
-  end
-  
-  --os.execute("sleep 0.8")
-  --map:forceShowMap()
-
-  for id_Tipes, tile_list in ipairs({cardinal_tiles, diagonal_tiles}) do
-  
-      for id_Tile, node in ipairs(tile_list) do
-          local x = node[1]
-          local y = node[2]
-          local from = node[3]
-          --print('pos['.. id_Tipes .. ',' .. id_Tile .. '] is: ' .. x .. ',' .. y .. ' number: ' .. from)
-          local tile = map:getTile(x,y)
-          --if(tile) then print('tileID = ' .. tile.id) end
-            map:setTile(x,y,1,1)
-          if tile.id ~= 0 then
-            current_tiles_next[#current_tiles_next+1] = node
-          end
-          if id_Tile > 2000 then
-           print('2000 PLUS')
-           break 
-          end
-          
-      end
-  end
-  
-  iter = iter + 1
-  if iter > 7 then 
-    print('Breaking')
-    break 
-  end
-  
-  running = running and #current_tiles_next > 0
-	current_tiles = current_tiles_next
-end
-
---]]
+autoExplore()

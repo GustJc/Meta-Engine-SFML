@@ -10,7 +10,7 @@
 
 namespace Textures
 {
-    enum ID { Gust, Number, Button, MAP };
+    enum ID { CHARS, ITENS, MAP };
 }
 class TextureManager
 {

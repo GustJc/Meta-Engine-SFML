@@ -6,15 +6,18 @@
 #include "Tile.h"
 #include "Map.h"
 #include "LuaManager.h"
+#include <string>
+#include <sstream>
 
 Player Player::PlayerControl;
 
 Player::Player()
 {
     //ctor
+    mGold = 0;
     mHasMoved = false;
     mDelay = 0;
-    type = ENT_PLAYER;
+    type = TYPE_PLAYER;
     isBot = false;
 }
 
@@ -75,7 +78,43 @@ void Player::events(sf::Event& event)
         }
     }
 }
-
+void Player::draw()
+{
+    Entity::draw();
+    //temporario, imprime valores
+    sf::RenderWindow& window = MetaEngine::EngineControl.getWindowReference();
+    std::stringstream stringTxt;
+    stringTxt << "Gold: " << mGold;
+    sf::Text txt(stringTxt.str(), MetaEngine::EngineControl.getFont(), 12);
+    txt.setColor(sf::Color::Yellow);
+    txt.setPosition(window.mapPixelToCoords(
+                                    sf::Vector2i(5,100)) );
+    window.draw(txt);
+    //Stats
+    stringTxt.str(std::string());       stringTxt << "HP: " << mHP;
+    txt.setString(stringTxt.str());     txt.setColor(sf::Color::Red);
+    txt.setPosition(window.mapPixelToCoords(
+                                    sf::Vector2i(5,100+20*1)) );
+    window.draw(txt);
+    //Stats
+    stringTxt.str(std::string());       stringTxt << "MP: " << mMP;
+    txt.setString(stringTxt.str());     txt.setColor(sf::Color::Blue);
+    txt.setPosition(window.mapPixelToCoords(
+                                    sf::Vector2i(5,100+20*2)) );
+    window.draw(txt);
+    //Stats
+    stringTxt.str(std::string());       stringTxt << "Atk: " << mAtk;
+    txt.setString(stringTxt.str());     txt.setColor(sf::Color::Magenta);
+    txt.setPosition(window.mapPixelToCoords(
+                                    sf::Vector2i(5,100+20*3)) );
+    window.draw(txt);
+    //Stats
+    stringTxt.str(std::string());       stringTxt << "Def: " << mAtk;
+    txt.setString(stringTxt.str());     txt.setColor(sf::Color::Magenta);
+    txt.setPosition(window.mapPixelToCoords(
+                                    sf::Vector2i(5,100+20*4)) );
+    window.draw(txt);
+}
 void Player::update(unsigned int dt)
 {
     if(mDead) return;

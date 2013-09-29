@@ -6,30 +6,32 @@
 #include "ConsoleInfo.h"
 #include <list>
 #include "Player.h"
+#include "Item.h"
 
 std::vector<Entity*> Entity::EntityList;
 Entity::Entity()
 {
     //ctor
-    type = ENT_PLAYER;
+    type = TYPE_PLAYER;
     mDelay = 0;
     mSpeed = 100;
     mAtk = 2;
-    mDef = 5;
+    mDef = 1;
     mRange = 5;
     mHP = 10;
     mDead = false;
 }
-Entity::Entity(ENUM_ENT_TYPE tipo)
+Entity::Entity(ENUM_TYPE_OBJ tipo)
 {
     type = tipo;
     mDelay = 0;
     mSpeed = 100;
     mAtk = 2;
-    mDef = 5;
+    mDef = 1;
     mRange = 5;
     mHP = 10;
     mDead = false;
+    mPosition.x = mPosition.y = 0;
 }
 
 Entity::~Entity()
@@ -41,50 +43,43 @@ Entity::~Entity()
 void Entity::draw()
 {
     if(mDead) return;
-    sf::Color c;
-    if(type == ENT_PLAYER){
-        c.b = 100;
-        c.g = 255;
-        c.r = 150;
-    } else
+
+    if(type == TYPE_ENEMY)
     {
-        c.b = 100;
-        c.g = 50;
-        c.r = 230;
-    }
+        sf::Color c;
+        c.g = 10;
+        c.b = 10;
+        c.a = 100;
+        c.r = 255;
+        //Imprime area;
 
-    int center = TILE_SIZE/4;
-    MetaEngine::EngineControl.drawRectVertex(mPosition.x*TILE_SIZE +center, mPosition.y*TILE_SIZE +center,
-                                             TILE_SIZE/2, TILE_SIZE/2, c);
-
-    if(type == ENT_PLAYER) return;
-    c.a = 100;
-    c.r = 255;
-    //Imprime area;
-
-    for(int i = -mRange; i <= mRange; ++i)
-    {
-        for(int j = -mRange; j <= mRange; ++j)
+        for(int i = -mRange; i <= mRange; ++i)
         {
-            float dist = (abs(mPosition.x+i - mPosition.x)
-                  + abs(mPosition.y+j - mPosition.y));
+            for(int j = -mRange; j <= mRange; ++j)
+            {
+                float dist = (abs(mPosition.x+i - mPosition.x)
+                      + abs(mPosition.y+j - mPosition.y));
 
-            if(dist > mRange) continue;
+                if(dist > mRange) continue;
 
-            MetaEngine::EngineControl.drawRectVertex( (mPosition.x+i)*TILE_SIZE,
-                                                     (mPosition.y+j)*TILE_SIZE,
-                                             TILE_SIZE, TILE_SIZE, c);
+                MetaEngine::EngineControl.drawRectVertex( (mPosition.x+i)*TILE_SIZE,
+                                                         (mPosition.y+j)*TILE_SIZE,
+                                                 TILE_SIZE, TILE_SIZE, c);
+            }
         }
     }
+
+    GameObject::draw();
 }
 //----------------- Update --------------------------------------
 void Entity::update(unsigned int dt, unsigned int delay)
 {
-    if(mDead) return;
-
     if(mHP <= 0)
     {
         mDead = true;
+        removeFromObjectList();
+        delete this;
+
         return;
     }
 
@@ -96,7 +91,7 @@ void Entity::update(unsigned int dt, unsigned int delay)
     {
         mDelay -= mSpeed;
 
-        if(type == ENT_ENEMY)
+        if(type == TYPE_ENEMY)
         {
             runAI();
         }
@@ -127,15 +122,28 @@ void Entity::movePosition(int px, int py)
         ConsoleInfo::MessageControl.addMessage("Passagem bloqueada.");
         return;
     } else //Se inimigo no tile.
-    if(tile->obj.empty() == false)
+    for(unsigned int i = 0; i < tile->obj.size(); ++i)
     {
-        ConsoleInfo::MessageControl.addMessage("Inimigo. Atacar!");
-        cout << "Atacando inimigo (" << mPosition.x+px << "," << mPosition.y+py << ")\n";
-        Entity* ent = (Entity*)tile->obj[0];
-        ent->mHP-= mAtk;
-        cout << "Defensor HP: " << ent->mHP << endl;
-        return;
-        //attack(mPosition.x + px, mPosition.y + py);
+        if(tile->obj[i]->type == TYPE_ENEMY || tile->obj[i]->type == TYPE_PLAYER)
+        {
+            //attack(mPosition.x + px, mPosition.y + py);
+            Entity* ent = (Entity*)tile->obj[i];
+            ConsoleInfo::MessageControl.addMessage("Inimigo. Atacar!");
+            cout << "Atacando inimigo (" << mAtk << "-" << ent->mDef << ")\n";
+            int dano = mAtk - ent->mDef;
+            if(dano > 0){
+                ent->mHP-= mAtk;
+            } else { dano = 0; }
+            cout << "Dano: " << dano << " Defensor HP: " << ent->mHP << endl;
+            return;
+        }
+        else
+        if (tile->obj[i]->type == TYPE_ITEM)
+        {
+            Item* item = (Item*)tile->obj[i];
+
+            item->useItem();
+        }
     }
 
     Tile* tileOld = Map::MapControl.getTile(mPosition.x, mPosition.y);

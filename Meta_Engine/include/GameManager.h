@@ -12,5 +12,6 @@ class GameManager
         virtual ~GameManager();
 
         int run(int argc, char* args[]);
+        void executeTests();
 };
 

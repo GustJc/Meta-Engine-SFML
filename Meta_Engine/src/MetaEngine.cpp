@@ -1,7 +1,7 @@
 #include "MetaEngine.h"
 #include "Defines.h"
 
-std::vector<Entity*> EntityList;
+std::vector<GameObject*> ObjectList;
 MetaEngine MetaEngine::EngineControl;
 void MetaEngine::drawRect(int x, int y, int w, int h, sf::Color color)
 {

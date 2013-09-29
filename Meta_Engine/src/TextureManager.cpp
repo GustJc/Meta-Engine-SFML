@@ -20,9 +20,10 @@ void TextureManager::load(Textures::ID id, const std::string& filename)
         throw std::runtime_error("TextureManager::load - failed to load " + filename);
     }
 
-    auto inserted = mTextureMap.insert(std::make_pair(id, std::move(texture)));
+    //auto inserted =
+    mTextureMap.insert(std::make_pair(id, std::move(texture)));
 
-    assert(inserted.second);
+    //assert(inserted.second);
 }
 
 sf::Texture& TextureManager::get(Textures::ID id)

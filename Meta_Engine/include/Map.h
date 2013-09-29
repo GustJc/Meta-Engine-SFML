@@ -35,7 +35,12 @@ class Map
         int getMapWidth();
         int getMapHeight();
 
+        GameObject* getObj(int x, int y, int index);
+
         //Lua
+
+        void forceShowMap();
+
         bool has_seens(int x, int y);
         bool has_remembers(int x, int y);
         bool has_passed(int x, int y);
@@ -45,6 +50,8 @@ class Map
         void setPassed(int x, int y);
         void setVisible(int x, int y);
         void setNotVisible(int x, int y);
+
+        void forceRemoveMapFlag(int x, int y, int flag);
 
         void mapseen();
         void mapfov();

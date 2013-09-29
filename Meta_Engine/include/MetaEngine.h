@@ -32,4 +32,4 @@ class MetaEngine
         sf::Font mFont;
         sf::View mViewGame;
 };
-extern std::vector<Entity*> EntityList;
+extern std::vector<GameObject*> ObjectList;

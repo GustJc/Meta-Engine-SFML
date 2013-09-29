@@ -1,33 +1,27 @@
 #pragma once
 #include "GameObject.h"
 #include <vector>
-enum ENUM_ENT_TYPE{
-    ENT_PLAYER,
-    ENT_ENEMY
-};
-
 class Tile;
 
 class Entity : public GameObject
 {
     public:
         static std::vector<Entity*> EntityList;
-        Entity(ENUM_ENT_TYPE tipo);
+        Entity(ENUM_TYPE_OBJ tipo);
         Entity();
         virtual ~Entity();
 
-        void draw();
+        virtual void draw();
         void update(unsigned int dt, unsigned int delay);
 
         void movePosition(int x, int y = 0);
         void movePosition(int number);
-
-        ENUM_ENT_TYPE type;
     //futuro protected
         double mSpeed;
         double mDelay;
         bool mDead;
         int mHP;
+        int mMP;
         int mAtk;
         int mDef;
         int mRange;

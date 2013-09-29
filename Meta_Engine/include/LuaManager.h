@@ -14,6 +14,7 @@ class LuaManager
 
         void startLua();
         void doFile(const char* filename);
+        void doFunctionInFile(const char* functionName);
 
         void loadConfigs(std::string filename, int& width, int& height, int& tile);
 

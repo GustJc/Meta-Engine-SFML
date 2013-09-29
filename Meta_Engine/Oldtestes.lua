@@ -192,36 +192,6 @@ function clearOpenTiles()
 
 end
 
-function autoExploreOld()
-    local moved = false
-    for _, node in ipairs(listAdjacentTiles(player.x, player.y,false, false)) do
-      local tile = map:getTile(node[1], node[2])
-      -- Se puder andar no tile, puder ver, e não tiver passado
-      
-      if tile.id ~= 0 and map:has_seens(node[1], node[2]) and map:has_passed(node[1], node[2]) == false then 
-        print('movendo ' .. node[1] .. ',' .. node[2] .. ' para ' .. node[3])
-        player:move(node[3])
-        moved = true
-        break
-      end
-    end
-    if moved == false then
-      local dir = math.random(8)
-      if(dir == 5) then 
-        dir = dir+1
-      end
-      player:move(dir);
-    end
-end
-
-function autoExplore()
-
-
-end
-
-autoExplore()
-
---[[
 clearOpenTiles()
 
 running = true
@@ -235,7 +205,7 @@ while running do
   local current_tiles_next = {}
 
   for _, node in ipairs(current_tiles) do
-			  adjacentTiles[node[3] ](node[1],node[2], cardinal_tiles, diagonal_tiles)
+			  adjacentTiles[node[3]](node[1],node[2], cardinal_tiles, diagonal_tiles)
 			  --print(_)
   end
   
@@ -271,6 +241,7 @@ while running do
   
   running = running and #current_tiles_next > 0
 	current_tiles = current_tiles_next
+	
+  
+  
 end
-
---]]

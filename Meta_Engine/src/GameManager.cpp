@@ -132,23 +132,20 @@ int GameManager::run(int argc, char* args[])
 
 
 
-    LuaManager::LuaControl.startLua();
-
 // - - - - - - - - - - - Carrega estado inicial - - - - - - - - - - - -
     mEstadoAtual = new StateGame(window);
     mEstadoAtual->load();
 
     ConsoleInfo::MessageControl.init();
 
-    Player::PlayerControl.startController();
 
 
-    Entity enTest(ENT_ENEMY);
-    //As vezes cria fora do map e erro de seg
-    enTest.setPosition(Player::PlayerControl.getPosition().x+2, Player::PlayerControl.getPosition().y+1);
-    enTest.movePosition(0,0);
-    enTest.mSpeed = 200;
-    enTest.geraRota(Player::PlayerControl.getPosition().x, Player::PlayerControl.getPosition().y);
+
+// - - - - - - - Testes
+    LuaManager::LuaControl.startLua();
+    executeTests();
+
+
 
 
 
@@ -162,11 +159,6 @@ int GameManager::run(int argc, char* args[])
             if(event.type == sf::Event::Closed){
                 window.close();
             }
-            /*
-            if(event.type == sf::Event::KeyPressed){
-                window.close();
-            }
-            */
             mEstadoAtual->events(event);
         }
         unsigned int dt = tempoDecorrido.getElapsedTime().asMilliseconds();
@@ -185,10 +177,6 @@ int GameManager::run(int argc, char* args[])
         default:
             break;
         }
-        if(Player::PlayerControl.mHasMoved)
-        {
-            enTest.update(0, Player::PlayerControl.mSpeed);
-        }
 
         //Limpa a tela
         window.clear();
@@ -201,9 +189,6 @@ int GameManager::run(int argc, char* args[])
 
         t.setString("Hellow");
         t.setPosition(10,10);
-        myMap.draw();
-        enTest.draw();
-        Player::PlayerControl.draw();
         en.getWindowReference().draw(t);
 
         mEstadoAtual->render();
@@ -244,4 +229,13 @@ GameManager::~GameManager()
         delete mEstadoAtual;
     }
     //dtor
+}
+
+void GameManager::executeTests()
+{
+    Player::PlayerControl.update(0);
+
+    Map::MapControl.forceRemoveMapFlag(Player::PlayerControl.getPositionX()-2, Player::PlayerControl.getPositionY(), EX_SEEN);
+
+    LuaManager::LuaControl.doFile("./testes.lua");
 }
