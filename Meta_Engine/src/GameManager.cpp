@@ -16,7 +16,11 @@
 #include "Player.h"
 #include "ConsoleInfo.h"
 
+#include "ResourceManager.h"
+
 using namespace std;
+
+
 int GameManager::run(int argc, char* args[])
 {
     LuaManager::LuaControl.loadConfigs("config.lua", MAP_WIDTH, MAP_HEIGHT, TILE_SIZE);
@@ -34,11 +38,11 @@ int GameManager::run(int argc, char* args[])
     view.setSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
     window.setView(view);
 
+    loadMainTextures();
+    LuaManager::LuaControl.startLua();
+
     Map& myMap = Map::MapControl;
     myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
-    //myMap.setTile(0,0,0,1);
-    //myMap.setTile(39,0,0,1);
-    //myMap.setTile(0,29,0,1);
 
     Procedural procedural;
     int mapType = 0;
@@ -142,7 +146,6 @@ int GameManager::run(int argc, char* args[])
 
 
 // - - - - - - - Testes
-    LuaManager::LuaControl.startLua();
     executeTests();
 
 
@@ -166,6 +169,10 @@ int GameManager::run(int argc, char* args[])
         //Update
         switch(mEstadoAtual->update(dt )  )
         {
+
+        case GST_LOSE:
+            cout << "You Lose!" << endl;
+            getchar();
         case GST_QUIT:
             mEstadoAtual->unload();
             delete mEstadoAtual;
@@ -178,10 +185,12 @@ int GameManager::run(int argc, char* args[])
             break;
         }
 
+        if(!mEstadoAtual) break;
+
         //Limpa a tela
         window.clear();
         sf::View& view = en.getViewGame();
-        view.setCenter(Player::PlayerControl.getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl.getPosition().y*TILE_SIZE-TILE_SIZE/4);
+        view.setCenter(Player::PlayerControl->getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl->getPosition().y*TILE_SIZE-TILE_SIZE/4);
         //view.setViewport(sf::FloatRect(0,0.2f, 1,1));
         window.setView(view);
         //Desenha
@@ -228,14 +237,50 @@ GameManager::~GameManager()
     {
         delete mEstadoAtual;
     }
+    if(Player::PlayerControl != nullptr)
+    {
+        delete Player::PlayerControl;
+    }
     //dtor
 }
 
 void GameManager::executeTests()
 {
-    Player::PlayerControl.update(0);
+    bool testResourceCreation   = false;
+    bool testExploration        = false;
+    if(testResourceCreation)
+    {
+        Item* item = ResourceManager::ResourceControl.createItem("testPotion");
+        item->mHp = 10;
+        Item* item2 = new Item( *ResourceManager::ResourceControl.getItem("potion") );
+        cout << "HP is: " << item2->mHp << endl;
+        delete item2;
 
-    Map::MapControl.forceRemoveMapFlag(Player::PlayerControl.getPositionX()-2, Player::PlayerControl.getPositionY(), EX_SEEN);
+        Entity* ent = ResourceManager::ResourceControl.createEntity("testlv0");
+        ent->mHP = 50;
+        Entity* ent2 = new Entity( *ResourceManager::ResourceControl.getEntity("testlv0") );
+        cout << "HP is: " << ent2->mHP << endl;
+        delete ent2;
+    }
+    if(testExploration)
+    {
+        Player::PlayerControl->update(0);
 
-    LuaManager::LuaControl.doFile("./testes.lua");
+        Map::MapControl.forceRemoveMapFlag(Player::PlayerControl->getPositionX()-2, Player::PlayerControl->getPositionY(), EX_SEEN);
+
+        LuaManager::LuaControl.doFile("./testes.lua");
+    }
+}
+
+
+
+void GameManager::loadMainTextures()
+{
+    TextureManager::TextureControl.load(Textures::ID::MAP, "data/img/tileset.png");
+    TextureManager::TextureControl.load(Textures::ID::CHARS, "data/img/chars.png");
+    TextureManager::TextureControl.load(Textures::ID::ITENS, "data/img/itens.png");
+    Map::MapControl.setSprite(TextureManager::TextureControl.get(Textures::ID::MAP));
+
+    Player::PlayerControl = new Player();
+    Player::PlayerControl->changeSprite(0);
 }

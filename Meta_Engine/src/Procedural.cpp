@@ -5,6 +5,7 @@
 #include "Defines.h"
 #include "Player.h"
 #include "Entity.h"
+#include "ResourceManager.h"
 using namespace std;
 Procedural::Procedural()
 {
@@ -75,6 +76,17 @@ void Procedural::makeMap(Map& mMap)
                 break;
             }
             mMap.setTile(n_x,n_y,TILE_FLOOR,1);
+            if(isChance(20.f)){
+                int goldCreated = rand() % 100;
+                ResourceManager::ResourceControl.addGold(n_x, n_y, goldCreated);
+                cout << "Gold(" << n_x << "," << n_y << "): " << goldCreated << endl;
+            } else
+            if(isChance(5.f))
+            {
+                std::string enemyCreated =
+                    ResourceManager::ResourceControl.addEntityByIndex(n_x,n_y, rand() % 6);
+                cout << "Enemy(" << n_x << "," << n_y << "): " << enemyCreated << endl;
+            }
         }
 
 
@@ -122,7 +134,7 @@ void Procedural::makeMap(Map& mMap)
 
     }
 
-    Player::PlayerControl.setPosition(mSalas[0].x, mSalas[0].y);
+    Player::PlayerControl->setPosition(mSalas[0].x, mSalas[0].y);
 
 }
 
@@ -235,5 +247,15 @@ void Procedural::makeMapMiner(Map& mMap)
         cout << "Acabou por tempo." << endl;
     }
     cout << "Miner criados: " << spawn << endl;
+
+}
+
+
+bool Procedural::isChance(float chance)
+{
+    float mChance = (float)( (rand() % 1000000) + 1) / 10000.f;
+    //cout << "Chance is: " << mChance << " of " << chance << endl;
+
+    return (mChance < chance);
 
 }

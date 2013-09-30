@@ -97,24 +97,23 @@ void GameObject::setTexture(sf::Texture& targetTexture)
 void GameObject::changeSprite(int x, int y)
 {
     assert(mSprite.getTexture() != nullptr);
+    if(y < 0)
+    {
+        int width = mSprite.getTexture()->getSize().x;
+        y =  x % width;
+        x =  x / width;
+    }
 
     mSprite.setTextureRect(sf::IntRect(x*TILE_SIZE, (int)(y*TILE_SIZE*mSprite.getTexture()->getSize().x) ,
                            TILE_SIZE, TILE_SIZE) );
 }
 
-void GameObject::changeSprite(int ID)
-{
-    assert(mSprite.getTexture() != nullptr);
-    int width = mSprite.getTexture()->getSize().x;
-    int x =  ID / width;
-    int y =  ID % width;
-
-    mSprite.setTextureRect(sf::IntRect(x*TILE_SIZE, y*TILE_SIZE*width ,
-                           TILE_SIZE, TILE_SIZE) );
-}
-
 void GameObject::draw()
 {
+    //test, mostra caso isFog false
+    if(MetaEngine::EngineControl.isMapFog() &&
+        Map::MapControl.has_seens(mPosition.x, mPosition.y) == false) return;
+
     if(mSprite.getTexture() == nullptr)
     {
         sf::Color c;
@@ -160,6 +159,7 @@ void GameObject::removeFromObjectList()
         if (ObjectList[i] == this)
         {
             ObjectList.erase(ObjectList.begin()+ i);
+            delete this;
             return;
         }
     }

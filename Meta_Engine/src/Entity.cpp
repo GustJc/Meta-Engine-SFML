@@ -7,31 +7,35 @@
 #include <list>
 #include "Player.h"
 #include "Item.h"
+#include "TextureManager.h"
 
 std::vector<Entity*> Entity::EntityList;
 Entity::Entity()
 {
     //ctor
-    type = TYPE_PLAYER;
+    type = TYPE_ENEMY;
     mDelay = 0;
-    mSpeed = 100;
+    mSpeedCost = 100;
     mAtk = 2;
     mDef = 1;
     mRange = 5;
     mHP = 10;
+    mMP = 10;
     mDead = false;
+    setTexture(TextureManager::TextureControl.get(Textures::ID::CHARS));
 }
 Entity::Entity(ENUM_TYPE_OBJ tipo)
 {
     type = tipo;
     mDelay = 0;
-    mSpeed = 100;
+    mSpeedCost = 100;
     mAtk = 2;
     mDef = 1;
     mRange = 5;
     mHP = 10;
     mDead = false;
     mPosition.x = mPosition.y = 0;
+    setTexture(TextureManager::TextureControl.get(Textures::ID::CHARS));
 }
 
 Entity::~Entity()
@@ -43,6 +47,9 @@ Entity::~Entity()
 void Entity::draw()
 {
     if(mDead) return;
+
+    if(MetaEngine::EngineControl.isMapFog() &&
+        Map::MapControl.has_seens(mPosition.x, mPosition.y) == false) return;
 
     if(type == TYPE_ENEMY)
     {
@@ -77,8 +84,7 @@ void Entity::update(unsigned int dt, unsigned int delay)
     if(mHP <= 0)
     {
         mDead = true;
-        removeFromObjectList();
-        delete this;
+        removeFromObjectList();//delete this
 
         return;
     }
@@ -87,9 +93,9 @@ void Entity::update(unsigned int dt, unsigned int delay)
     //Quando delay for mais que speed, realiza 1 movimento.
     mDelay += delay;
 
-    while(mDelay >= mSpeed)
+    while(mDelay >= mSpeedCost)
     {
-        mDelay -= mSpeed;
+        mDelay -= mSpeedCost;
 
         if(type == TYPE_ENEMY)
         {
@@ -101,11 +107,11 @@ void Entity::update(unsigned int dt, unsigned int delay)
 //----------------- Run AI --------------------------------------
 void Entity::runAI()
 {
-    float dist = (abs(Player::PlayerControl.getPosition().x - mPosition.x)
-                  + abs(Player::PlayerControl.getPosition().y - mPosition.y));
+    float dist = (abs(Player::PlayerControl->getPosition().x - mPosition.x)
+                  + abs(Player::PlayerControl->getPosition().y - mPosition.y));
     //cout << "Dist: " << dist << endl;
     if( dist  > mRange ) return;
-    geraRota(Player::PlayerControl.getPosition().x, Player::PlayerControl.getPosition().y);
+    geraRota(Player::PlayerControl->getPosition().x, Player::PlayerControl->getPosition().y);
 
     if(RotaList.empty()) return;
 
@@ -132,13 +138,14 @@ void Entity::movePosition(int px, int py)
             cout << "Atacando inimigo (" << mAtk << "-" << ent->mDef << ")\n";
             int dano = mAtk - ent->mDef;
             if(dano > 0){
-                ent->mHP-= mAtk;
+                ent->mHP-= dano;
+                if(ent->mHP < 0) ent->mHP = 0;
             } else { dano = 0; }
             cout << "Dano: " << dano << " Defensor HP: " << ent->mHP << endl;
             return;
         }
         else
-        if (tile->obj[i]->type == TYPE_ITEM)
+        if (tile->obj[i]->type == TYPE_ITEM && type == TYPE_PLAYER)
         {
             Item* item = (Item*)tile->obj[i];
 
@@ -191,6 +198,26 @@ void Entity::movePosition(int number)
         break;
     }
 }
+
+bool Entity::isRota()
+{
+    return (RotaList.empty() == false);
+}
+
+void Entity::moveRota()
+{
+    if (RotaList.empty()) return;
+
+    sf::Vector2i& tile = RotaList[0];
+
+    int moveX = tile.x - mPosition.x;
+    int moveY = tile.y - mPosition.y;
+
+    movePosition(moveX,moveY);
+
+    RotaList.erase(RotaList.begin());
+}
+
 //----------------- Get Route --------------------------------------
 void Entity::geraRota(int dx, int dy)
 {

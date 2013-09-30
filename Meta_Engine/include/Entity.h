@@ -17,7 +17,7 @@ class Entity : public GameObject
         void movePosition(int x, int y = 0);
         void movePosition(int number);
     //futuro protected
-        double mSpeed;
+        double mSpeedCost;
         double mDelay;
         bool mDead;
         int mHP;
@@ -28,6 +28,8 @@ class Entity : public GameObject
         std::vector<sf::Vector2i> RotaList;
 
         void geraRota(int dx, int dy);
+        bool isRota();
+        void moveRota();
     protected:
         void runAI();
 

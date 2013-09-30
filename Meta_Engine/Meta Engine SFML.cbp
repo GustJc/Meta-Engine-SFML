@@ -73,6 +73,9 @@
 		<Unit filename="include/Procedural.h">
 			<Option virtualFolder="Procedural/" />
 		</Unit>
+		<Unit filename="include/ResourceManager.h">
+			<Option virtualFolder="Engine/" />
+		</Unit>
 		<Unit filename="include/State.h">
 			<Option virtualFolder="Stados/" />
 		</Unit>
@@ -122,6 +125,9 @@
 		</Unit>
 		<Unit filename="src/Procedural.cpp">
 			<Option virtualFolder="Procedural/" />
+		</Unit>
+		<Unit filename="src/ResourceManager.cpp">
+			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="src/State.cpp">
 			<Option virtualFolder="Stados/" />

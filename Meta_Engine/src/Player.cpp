@@ -9,7 +9,7 @@
 #include <string>
 #include <sstream>
 
-Player Player::PlayerControl;
+Player* Player::PlayerControl = nullptr;
 
 Player::Player()
 {
@@ -17,6 +17,7 @@ Player::Player()
     mGold = 0;
     mHasMoved = false;
     mDelay = 0;
+    mSpeedCost = 100;
     type = TYPE_PLAYER;
     isBot = false;
 }

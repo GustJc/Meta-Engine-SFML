@@ -8,6 +8,8 @@ typedef enum eStateType {
     GST_GAME,
     GST_MENU,
     GST_QUIT,
+    GST_LOSE,
+    GST_WIN,
     GST_NONE
 } StateType;
 

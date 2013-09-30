@@ -29,8 +29,7 @@ class GameObject
         virtual void draw();
 
         void setTexture(sf::Texture& targetTexture);
-        void changeSprite(int x, int y);
-        void changeSprite(int ID);
+        void changeSprite(int x, int y = -1);
 
         void addToObjectList();
         void removeFromObjectList();

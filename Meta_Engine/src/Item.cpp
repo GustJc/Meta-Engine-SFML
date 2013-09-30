@@ -5,7 +5,7 @@ Item::Item()
 {
     //ctor
     mHp = mMp = mAtk = mDef = mGold = 0;
-    mIsBuff = false;
+    mIsBuff = true;
     type = TYPE_ITEM;
 
     setTexture(TextureManager::TextureControl.get(Textures::ID::ITENS));
@@ -50,12 +50,11 @@ void Item::useItem()
 {
     if(mIsBuff)
     {
-        Player::PlayerControl.mHP += mHp;
-        Player::PlayerControl.mMP += mMp;
-        Player::PlayerControl.mGold += mGold;
+        Player::PlayerControl->mHP += mHp;
+        Player::PlayerControl->mMP += mMp;
+        Player::PlayerControl->mGold += mGold;
     }
 
     removeFromTileReference();
-    removeFromObjectList();
-    delete this;
+    removeFromObjectList(); //deleta item
 }

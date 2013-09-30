@@ -19,6 +19,7 @@ class Procedural
         int vida_max;
         int chance_spawn;
         int total_life;
+        bool isChance(float chance);
     protected:
         struct Sala
         {

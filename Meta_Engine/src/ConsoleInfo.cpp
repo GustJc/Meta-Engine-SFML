@@ -312,13 +312,13 @@ bool ConsoleInfo::executeCommand(std::string str)
         }
         if(tokens[1].compare("enableBot") == 0)
         {
-            Player::PlayerControl.isBot = true;
+            Player::PlayerControl->isBot = true;
             return true;
         }
         else
         if(tokens[1].compare("disableBot") == 0)
         {
-            Player::PlayerControl.isBot = false;
+            Player::PlayerControl->isBot = false;
             return true;
         }
         else

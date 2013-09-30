@@ -11,6 +11,7 @@ using namespace std;
 #include "Entity.h"
 #include "Player.h"
 #include "Map.h"
+#include "ResourceManager.h"
 
 LuaManager LuaManager::LuaControl;
 
@@ -22,9 +23,6 @@ void LuaManager::startLua()
 	luaL_openlibs(L);
 	luabind::open(L);
 
-	luaL_dostring(L,
-				  "print(2)\n"
-				  );
     luabind::module(L) [
         bindClasses()
 	];
@@ -33,33 +31,15 @@ void LuaManager::startLua()
         &Map::MapControl;
 
     luabind::globals(L)["player"] =
-        &Player::PlayerControl;
+        Player::PlayerControl;
 
-	Tile t; t.id = 1;
-	luabind::globals(L)["tile"] = t;
+    luabind::globals(L)["resources"] =
+        &ResourceManager::ResourceControl;
 
-	sf::Vector2i v(1,2);
-	luabind::globals(L)["v"] = &v;
-	Entity obj; obj.setPosition(2,1);
-	luabind::globals(L)["obj"] = &obj;
+    //executeTests();
 
-	int error = luaL_dostring(L,
-				  "print('map height: ' .. map.h)\n"
-				  "print('map width: ' .. map.w)\n"
-				  "print('tile t: ' .. tile.id)\n"
-				  "print('vector: ' .. v.x .. ',' .. v.y)\n"
-				  "print('obj: ' .. obj:getPos().x .. ',' .. obj:getPos().y)\n"
-				  "t = map:getTile(0,0)\n"
-				  "print(t.id)\n"
-				  );
-
-
-    cout << obj.getPosition().x << "," << obj.getPosition().y << endl;
-
-    if(error != 0)
-        ReportLuaError(L);
-
-    //doFile("./testes.lua");
+    doFile("./data/scripts/itens.lua");
+    doFile("./data/scripts/entitys.lua");
 
 }
 
@@ -97,6 +77,10 @@ luabind::scope LuaManager::bindClasses()
         .property("x", &GameObject::getPositionX)
         .property("y", &GameObject::getPositionY)
         .def_readwrite("type", &GameObject::type)
+        .def("changeSprite", &GameObject::changeSprite)
+        .def("addObj", &GameObject::addToObjectList )
+        .def("removeObj", &GameObject::removeFromObjectList )
+        .def("removeReference", &GameObject::removeFromTileReference )
         .def("getPos", &GameObject::getPosition )
         .def("setPos", (void (GameObject::*)(int, int))&GameObject::setPosition )
         .def("setPos", (void (GameObject::*)(sf::Vector2i))&GameObject::setPosition )
@@ -113,11 +97,38 @@ luabind::scope LuaManager::bindClasses()
 
     luabind::class_<Entity, GameObject>("Entity")
         .def( luabind::constructor<>( ) )
+        .def_readwrite("mHp", &Entity::mHP)
+        .def_readwrite("mMp", &Entity::mMP)
+        .def_readwrite("mSpeedCost", &Entity::mSpeedCost)
+        .def_readwrite("mRange", &Entity::mRange)
+        .def_readwrite("mAtk", &Entity::mAtk)
+        .def_readwrite("mDef", &Entity::mDef)
         .def("move", (void (Entity::*)(int, int))&Entity::movePosition)
         .def("move", (void (Entity::*)(int))&Entity::movePosition)
-        .def("geraRota", &Entity::geraRota),
+        .def("geraRota", &Entity::geraRota)
+        .def("isRota", &Entity::isRota)
+        .def("moveRota", &Entity::moveRota),
 
     luabind::class_<Player, Entity>("Player")
+        .def( luabind::constructor<>( ) ),
+
+    luabind::class_<Item>("Item")
+        .def( luabind::constructor<>( ) )
+        .def_readwrite("mHp", &Item::mHp)
+        .def_readwrite("mMp", &Item::mMp)
+        .def_readwrite("mAtk", &Item::mAtk)
+        .def_readwrite("mDef", &Item::mDef)
+        .def_readwrite("mIsBuff", &Item::mIsBuff)
+        .def_readwrite("mGold", &Item::mGold),
+
+    luabind::class_<ResourceManager>("ResourceManager")
+        .def( luabind::constructor<>( ) )
+        .def( "createItem", &ResourceManager::createItem)
+        .def( "createEntity", &ResourceManager::createEntity)
+        .def( "getItem", &ResourceManager::getItem)
+        .def( "getEntity", &ResourceManager::getEntity),
+
+    luabind::class_<std::string>("stdString")
         .def( luabind::constructor<>( ) )
     ;
 }
@@ -207,3 +218,29 @@ LuaManager::~LuaManager()
         lua_close(L);
 }
 
+void LuaManager::executeTests()
+{
+    Tile t; t.id = 1;
+	luabind::globals(L)["tile"] = t;
+
+	sf::Vector2i v(1,2);
+	luabind::globals(L)["v"] = &v;
+	Entity obj; obj.setPosition(2,1);
+	luabind::globals(L)["obj"] = &obj;
+
+	int error = luaL_dostring(L,
+				  "print('map height: ' .. map.h)\n"
+				  "print('map width: ' .. map.w)\n"
+				  "print('tile t: ' .. tile.id)\n"
+				  "print('vector: ' .. v.x .. ',' .. v.y)\n"
+				  "print('obj: ' .. obj:getPos().x .. ',' .. obj:getPos().y)\n"
+				  "t = map:getTile(0,0)\n"
+				  "print(t.id)\n"
+				  );
+
+
+    cout << obj.getPosition().x << "," << obj.getPosition().y << endl;
+
+    if(error != 0)
+        ReportLuaError(L);
+}

@@ -19,7 +19,7 @@ class Player : public Entity
         void startController();
         void resetMoved();
 
-        static Player PlayerControl;
+        static Player* PlayerControl;
 
         bool mHasMoved;
         bool isBot;

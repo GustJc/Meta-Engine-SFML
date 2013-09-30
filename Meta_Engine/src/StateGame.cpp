@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "MetaEngine.h"
 #include "TextureManager.h"
+#include "ResourceManager.h"
 #include "Map.h"
 #include "Item.h"
 
@@ -20,28 +21,28 @@ StateGame::~StateGame()
 
 void StateGame::load(int stack)
 {
-    TextureManager::TextureControl.load(Textures::ID::MAP, "data/img/tileset.png");
-    TextureManager::TextureControl.load(Textures::ID::CHARS, "data/img/chars.png");
-    TextureManager::TextureControl.load(Textures::ID::ITENS, "data/img/itens.png");
-    Map::MapControl.setSprite(TextureManager::TextureControl.get(Textures::ID::MAP));
 
 
+    /* testes
     Entity* enTest = new Entity(TYPE_ENEMY);
     //As vezes cria fora do map e erro de seg
-    enTest->setPosition(Player::PlayerControl.getPosition().x+2, Player::PlayerControl.getPosition().y+1);
-    enTest->movePosition(0,0);
-    enTest->mSpeed = 200;
-    enTest->geraRota(Player::PlayerControl.getPosition().x, Player::PlayerControl.getPosition().y);
+    enTest->setPosition(Player::PlayerControl->getPosition().x+2, Player::PlayerControl->getPosition().y+1);
+    enTest->mSpeedCost = 200;
+    enTest->geraRota(Player::PlayerControl->getPosition().x, Player::PlayerControl->getPosition().y);
     enTest->addToObjectList();
     enTest->setTexture(TextureManager::TextureControl.get(Textures::ID::CHARS));
     enTest->changeSprite(1,0);
 
-    Player::PlayerControl.setTexture(TextureManager::TextureControl.get(Textures::ID::CHARS));
-    Player::PlayerControl.changeSprite(0);
+    Player::PlayerControl->setTexture(TextureManager::TextureControl.get(Textures::ID::CHARS));
+    Player::PlayerControl->changeSprite(0);
 
     Item* item = new Item(3,0);
-    item->setPosition(Player::PlayerControl.getPosition().x-2, Player::PlayerControl.getPosition().y+1);
+    item->setPosition(Player::PlayerControl->getPosition().x-2, Player::PlayerControl->getPosition().y+1);
     item->addToObjectList();
+
+    ResourceManager::ResourceControl.addGold(Player::PlayerControl->getPosition().x-1, Player::PlayerControl->getPosition().y-1,
+                                             120);
+    */
 }
 
 int StateGame::unload()
@@ -59,16 +60,21 @@ int StateGame::unload()
 void StateGame::events(sf::Event& event)
 {
     ConsoleInfo::MessageControl.events(event);
-    Player::PlayerControl.events(event);
+    Player::PlayerControl->events(event);
 }
 eStateType StateGame::update(unsigned int dt)
 {
-    Player::PlayerControl.update(dt);
-    if(Player::PlayerControl.mHasMoved)
+    if(Player::PlayerControl->mDead)
+    {
+        return GST_LOSE;
+    }
+
+    Player::PlayerControl->update(dt);
+    if(Player::PlayerControl->mHasMoved)
     {
         for(unsigned int i = 0; i < ObjectList.size();++i)
         {
-            ObjectList[i]->update(0, Player::PlayerControl.mSpeed);
+            ObjectList[i]->update(0, Player::PlayerControl->mSpeedCost);
         }
     }
     return GST_NONE;
@@ -82,9 +88,9 @@ void StateGame::render()
     {
         ObjectList[i]->draw();
     }
-    Player::PlayerControl.draw();
+    Player::PlayerControl->draw();
 
-    Player::PlayerControl.resetMoved();
+    Player::PlayerControl->resetMoved();
     ConsoleInfo::MessageControl.draw();
 
 /*

@@ -181,7 +181,7 @@ bool Map::has_remembers(int x, int y)
     if(x < 0 || x > (int)tileMap.size()) return false;
     if(y < 0 || y > (int)tileMap[0].size()) return false;
 
-    return isFlag(exploreMap[x][y], EX_HAS_SEEN);
+    return (isFlag(exploreMap[x][y], EX_HAS_SEEN) );
 }
 
 bool Map::has_passed(int x, int y)
@@ -254,11 +254,11 @@ void Map::forceShowMap()
     MetaEngine::EngineControl.setMapFog(false);
     MetaEngine::EngineControl.getWindowReference().clear();
     sf::View& view = MetaEngine::EngineControl.getViewGame();
-    view.setCenter(Player::PlayerControl.getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl.getPosition().y*TILE_SIZE-TILE_SIZE/4);
+    view.setCenter(Player::PlayerControl->getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl->getPosition().y*TILE_SIZE-TILE_SIZE/4);
     MetaEngine::EngineControl.getWindowReference().setView(view);
 
     draw();
-    Player::PlayerControl.draw();
+    Player::PlayerControl->draw();
 
     MetaEngine::EngineControl.getWindowReference().display();
 }
