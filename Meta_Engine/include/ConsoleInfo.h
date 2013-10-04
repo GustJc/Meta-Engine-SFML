@@ -23,10 +23,13 @@ class ConsoleInfo
         void nextPage();
         void clearMessages();
 
+        bool isConsoleOnline();
+        bool isReturn();
+
+        void setViewPortOnline(bool on = true);
     protected:
         void processCommand();
         bool executeCommand(std::string str);
-        void setViewPortOnline(bool on = true);
         void setMessageFromLog(int add);
 
         std::stringstream       mString;
@@ -40,6 +43,7 @@ class ConsoleInfo
         unsigned int            mLimitMsg;
         unsigned int            mLimitMsgLog;
         bool                    mConsoleOnline;
+        bool                    mReturn;
         //Info, mensagens alertas sobre o jogo
         std::vector<sf::Text>   mConsoleInfo;
         //Console log, log de mensagens do console.

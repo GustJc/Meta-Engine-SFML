@@ -12,10 +12,10 @@ class Entity : public GameObject
         virtual ~Entity();
 
         virtual void draw();
-        void update(unsigned int dt, unsigned int delay);
+        virtual void update(unsigned int dt, unsigned int delay);
 
-        void movePosition(int x, int y = 0);
-        void movePosition(int number);
+        virtual void movePosition(int x = 0, int y = 0);
+        virtual void movePosition(int number);
     //futuro protected
         double mSpeedCost;
         double mDelay;

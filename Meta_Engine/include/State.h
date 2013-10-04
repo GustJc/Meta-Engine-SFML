@@ -24,12 +24,12 @@ class State
         virtual void render() = 0;
         virtual void events(sf::Event& event) = 0;
         virtual ~State(){};
-        State(sf::RenderWindow& wnd) : window(wnd){mStack = 0;};
+        State(sf::RenderWindow& wnd) : window(wnd){mStack = 0;mStado = GST_NONE;};
 
     protected:
         sf::RenderWindow& window;
         std::vector<std::unique_ptr<Entity>> EntityList;
         int mStack;
-
+        eStateType mStado;
 };
 

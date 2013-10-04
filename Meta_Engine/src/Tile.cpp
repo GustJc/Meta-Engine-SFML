@@ -4,7 +4,7 @@ Tile::Tile()
 {
     //ctor
     id = TILE_SOLID;
-    color = 0;
+    tipo = 0;
     obj.clear();
 }
 

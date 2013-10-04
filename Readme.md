@@ -1,6 +1,13 @@
-- Meta Engine -
+=Meta Engine=
 
--- Engine feito em SFML -- 
+Engine feito em SFML
+
+==Requisitos==
+-SFML 2.1
+-SFGUI 0.9
+-Lua 5.1
+-Luabind 0.9.8
+
 
 == Testes de algoritmos procedurais == 
 

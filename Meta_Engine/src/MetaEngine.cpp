@@ -33,6 +33,10 @@ sf::RenderWindow& MetaEngine::getWindowReference()
 {
     return mWindow;
 }
+sfg::SFGUI& MetaEngine::getSFGUIReference()
+{
+    return mSfgui;
+}
 
 sf::Font& MetaEngine::getFont()
 {

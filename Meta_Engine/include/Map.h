@@ -27,6 +27,9 @@ class Map
         void draw();
 
         void createMap(int sizeW, int sizeH);
+        bool loadMap(std::string filename);
+        void saveMap();
+        void clearMap();
         void setTile(int x, int y, int tileID, int tileColor);
         Tile* getTile(int x, int y);
 
@@ -36,6 +39,7 @@ class Map
         int getMapHeight();
 
         GameObject* getObj(int x, int y, int index);
+        GameObject* getIfObj(int x, int y, int typeObj);
 
         //Lua
 

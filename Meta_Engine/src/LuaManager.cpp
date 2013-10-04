@@ -51,6 +51,7 @@ luabind::scope LuaManager::bindClasses()
 	   .property("h", &Map::getMapHeight)
 	   .property("w", &Map::getMapWidth)
 	   .def("forceShowMap", &Map::forceShowMap)
+	   .def("getIfObj", &Map::getObj)
 	   .def("getObj", &Map::getObj)
 	   .def("getTile", &Map::getTile)
 	   .def("setTile", &Map::setTile)
@@ -65,7 +66,14 @@ luabind::scope LuaManager::bindClasses()
 
     luabind::class_<Tile>("Tile")
         .def( luabind::constructor<>( ) )
-        .def_readwrite("id", &Tile::id),
+        .def_readwrite("id", &Tile::id)
+        .enum_("Tile_type")
+        [
+            luabind::value("FLOOR", TILE_FLOOR),
+            luabind::value("FINISH", TILE_FINISH_LV),
+            luabind::value("CHEST", TILE_OBJ_CHEST),
+            luabind::value("WALL", TILE_SOLID)
+        ],
 
     luabind::class_<sf::Vector2i>("Vector2i")
         .def( luabind::constructor<>( ) )
@@ -110,9 +118,11 @@ luabind::scope LuaManager::bindClasses()
         .def("moveRota", &Entity::moveRota),
 
     luabind::class_<Player, Entity>("Player")
-        .def( luabind::constructor<>( ) ),
+        .def( luabind::constructor<>( ) )
+        .def_readwrite("mHasEnemys", &Player::mHasEnemys)
+        .def_readwrite("mHasNewTiles", &Player::mHasNewTiles),
 
-    luabind::class_<Item>("Item")
+    luabind::class_<Item, GameObject>("Item")
         .def( luabind::constructor<>( ) )
         .def_readwrite("mHp", &Item::mHp)
         .def_readwrite("mMp", &Item::mMp)

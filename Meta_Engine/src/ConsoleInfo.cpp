@@ -76,7 +76,7 @@ void ConsoleInfo::events(const sf::Event& event)
                 int pos = mString.tellp();
                 string str(mString.str() );
                 int extra = str.length() - pos;
-                cout << "extra: " << extra << " len: " << str.length() << endl;
+
                 if(event.text.unicode == 127 || str.length() - extra > 2)
                 {
                     //se Delete
@@ -157,7 +157,13 @@ void ConsoleInfo::events(const sf::Event& event)
         {   //Seta mConsoleOnline = true
             setViewPortOnline(true);
         }
+        else {
+            clearMessages();
+        }
+
+
     }
+
 }
 
 //------------------ Desenha -----------------------------------------------------------------------
@@ -261,6 +267,7 @@ void ConsoleInfo::clearMessages()
 //------------------ Viewpor Online -----------------------------------------------------------------------
 void ConsoleInfo::setViewPortOnline(bool on)
 {
+    mReturn = false;
     if(on)
     {
         mView.setViewport(sf::FloatRect(0,0,1,0.2f));
@@ -325,6 +332,25 @@ bool ConsoleInfo::executeCommand(std::string str)
         if(tokens[1].compare("exit") == 0 || tokens[1].compare("quit") == 0)
         {
             exit(0);
+        } else
+        if(tokens[1].compare("return") == 0 || tokens[1].compare("menu") == 0)
+        {
+            mReturn = true;
+            return true;
+        } else
+        if(tokens[1].compare("botDelay") == 0 || tokens[1].compare("setBotDelay") == 0)
+        {
+            if(tokens.size() <= 2)
+            {
+                mConsoleLog.push_back(sf::Text(std::string("Uso invalido, setBotDelay int"), MetaEngine::EngineControl.getFont(), 12));
+            } else
+            {
+                std::istringstream is(tokens[2]);
+                int b;
+                is >> b;
+                Player::PlayerControl->mBotDelay = b;
+            }
+            return true;
         }
 
     return false;
@@ -354,3 +380,12 @@ void ConsoleInfo::setMessageFromLog(int add)
 
 }
 
+bool ConsoleInfo::isConsoleOnline()
+{
+    return mConsoleOnline;
+}
+
+bool ConsoleInfo::isReturn()
+{
+    return mReturn;
+}

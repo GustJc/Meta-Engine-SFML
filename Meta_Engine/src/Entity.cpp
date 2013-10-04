@@ -8,7 +8,8 @@
 #include "Player.h"
 #include "Item.h"
 #include "TextureManager.h"
-
+#include "DataHolder.h"
+#include <sstream>
 std::vector<Entity*> Entity::EntityList;
 Entity::Entity()
 {
@@ -84,6 +85,7 @@ void Entity::update(unsigned int dt, unsigned int delay)
     if(mHP <= 0)
     {
         mDead = true;
+        DataHolder::RunData.enemys_KO++;
         removeFromObjectList();//delete this
 
         return;
@@ -121,6 +123,7 @@ void Entity::runAI()
 //----------------- movePosition --------------------------------------
 void Entity::movePosition(int px, int py)
 {
+    if(px == 0 && py == 0) return;
     Tile* tile = Map::MapControl.getTile(mPosition.x + px, mPosition.y + py);
     //Se solido, ou se objeto no tile,  não anda.
     if (tile == nullptr || tile->id == TILE_SOLID)
@@ -130,17 +133,29 @@ void Entity::movePosition(int px, int py)
     } else //Se inimigo no tile.
     for(unsigned int i = 0; i < tile->obj.size(); ++i)
     {
-        if(tile->obj[i]->type == TYPE_ENEMY || tile->obj[i]->type == TYPE_PLAYER)
+        if((type == TYPE_PLAYER && tile->obj[i]->type == TYPE_ENEMY) ||
+           (type == TYPE_ENEMY && tile->obj[i]->type == TYPE_PLAYER) )
         {
             //attack(mPosition.x + px, mPosition.y + py);
             Entity* ent = (Entity*)tile->obj[i];
-            ConsoleInfo::MessageControl.addMessage("Inimigo. Atacar!");
             cout << "Atacando inimigo (" << mAtk << "-" << ent->mDef << ")\n";
+
             int dano = mAtk - ent->mDef;
             if(dano > 0){
                 ent->mHP-= dano;
                 if(ent->mHP < 0) ent->mHP = 0;
             } else { dano = 0; }
+            if(tile->obj[i]->type == TYPE_ENEMY)
+            { //Se obj inimigo, player atacando... supostamente
+                std::stringstream stream;
+                stream << "Voce ataca inimigo com " << dano << " de dano!";
+                ConsoleInfo::MessageControl.addMessage( stream.str() );
+            } else
+            {
+                std::stringstream stream;
+                stream << "Inimigo te ataca com " << dano << " de dano!";
+                ConsoleInfo::MessageControl.addMessage( stream.str() );
+            }
             cout << "Dano: " << dano << " Defensor HP: " << ent->mHP << endl;
             return;
         }
@@ -150,6 +165,8 @@ void Entity::movePosition(int px, int py)
             Item* item = (Item*)tile->obj[i];
 
             item->useItem();
+            --i; //Deleta tile, do vetor então i diminui
+            DataHolder::RunData.itens_get++;
         }
     }
 
@@ -208,14 +225,10 @@ void Entity::moveRota()
 {
     if (RotaList.empty()) return;
 
-    sf::Vector2i& tile = RotaList[0];
+    int last = RotaList.size()-1;
+    movePosition(RotaList[last].x - mPosition.x, RotaList[last].y - mPosition.y);
 
-    int moveX = tile.x - mPosition.x;
-    int moveY = tile.y - mPosition.y;
-
-    movePosition(moveX,moveY);
-
-    RotaList.erase(RotaList.begin());
+    RotaList.erase(RotaList.end());
 }
 
 //----------------- Get Route --------------------------------------

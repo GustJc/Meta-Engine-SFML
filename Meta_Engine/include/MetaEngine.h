@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "Entity.h"
 #include <vector>
+#include <SFGUI/SFGUI.hpp>
 class MetaEngine
 {
     public:
@@ -11,6 +12,7 @@ class MetaEngine
         void drawRectVertex(int x, int y, int w, int h, sf::Color color);
 
         sf::RenderWindow& getWindowReference();
+        sfg::SFGUI&       getSFGUIReference();
         sf::Font& getFont();
         sf::View& getViewGame();
 
@@ -31,5 +33,6 @@ class MetaEngine
         sf::RenderWindow mWindow;
         sf::Font mFont;
         sf::View mViewGame;
+        sfg::SFGUI mSfgui;
 };
 extern std::vector<GameObject*> ObjectList;

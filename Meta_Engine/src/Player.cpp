@@ -14,12 +14,28 @@ Player* Player::PlayerControl = nullptr;
 Player::Player()
 {
     //ctor
+    resetPlayer();
+    mBotDelay = 400;
+}
+
+void Player::resetPlayer()
+{
     mGold = 0;
     mHasMoved = false;
     mDelay = 0;
     mSpeedCost = 100;
     type = TYPE_PLAYER;
     isBot = false;
+    mHasNewTiles = mHasEnemys = false;
+    mHasWon = false;
+    mAtk = 2;
+    mDef = 1;
+    mRange = 5;
+    mHP = 10;
+    mMP = 10;
+    mDead = false;
+    RotaList.clear();
+
 }
 
 Player::~Player()
@@ -36,6 +52,7 @@ void Player::events(sf::Event& event)
         if(event.key.code == sf::Keyboard::Period)
         {
             mHasMoved = true;
+            movePosition();
         }
         if(event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
         {
@@ -110,7 +127,7 @@ void Player::draw()
                                     sf::Vector2i(5,100+20*3)) );
     window.draw(txt);
     //Stats
-    stringTxt.str(std::string());       stringTxt << "Def: " << mAtk;
+    stringTxt.str(std::string());       stringTxt << "Def: " << mDef;
     txt.setString(stringTxt.str());     txt.setColor(sf::Color::Magenta);
     txt.setPosition(window.mapPixelToCoords(
                                     sf::Vector2i(5,100+20*4)) );
@@ -132,43 +149,15 @@ void Player::update(unsigned int dt)
     Tile* tile = Map::MapControl.getTile(mPosition.x, mPosition.y);
     if(tile->id == TILE_FINISH_LV)
     {
-        cout << "Win!" << endl;
-        getchar();
-        exit(0);
+        mHasWon = true;
     }
-
-    Map::MapControl.setPassed(mPosition.x, mPosition.y);
-
-    for(int i = -mRange; i <= mRange; ++i)
-    {
-        for(int j = -mRange; j <= mRange; ++j)
-        {
-            float dist = (abs(mPosition.x+i - mPosition.x)
-                  + abs(mPosition.y+j - mPosition.y));
-
-            if(dist > mRange) continue;
-
-            int kx = mPosition.x+i;
-            int ky = mPosition.y+j;
-
-            Tile* tile = Map::MapControl.getTile(kx,ky);
-            if(tile == nullptr) continue;
-
-            Map::MapControl.setSeen(kx, ky);
-        }
-    }
-
-
 
     if(isBot)
     {
         mDelay += dt;
-        if(mDelay < 100) return;
+        if(mDelay < mBotDelay) return;
 
-        //cout << "Position: "<< mPosition.x <<", " << mPosition.y << endl;
-        cout << "temp: " << mDelay << endl;
-
-        mDelay -= 100;
+        mDelay -= mBotDelay;
 
         runBotAI();
         mHasMoved = true;
@@ -188,6 +177,51 @@ void Player::runBotAI()
 void Player::resetMoved()
 {
     mHasMoved = false;
+}
+
+
+//-------------- Move ---------------------//
+void Player::movePosition(int x, int y)
+{
+    Entity::movePosition(x,y);
+
+    mHasNewTiles = mHasEnemys = false;
+
+    Map::MapControl.setPassed(mPosition.x, mPosition.y);
+
+    for(int i = -mRange; i <= mRange; ++i)
+    {
+        for(int j = -mRange; j <= mRange; ++j)
+        {
+            float dist = (abs(mPosition.x+i - mPosition.x)
+                  + abs(mPosition.y+j - mPosition.y));
+
+            if(dist > mRange) continue;
+
+            int kx = mPosition.x+i;
+            int ky = mPosition.y+j;
+
+            Tile* tile = Map::MapControl.getTile(kx,ky);
+            if(tile == nullptr) continue;
+
+            if(Map::MapControl.has_seens(kx,ky) == false)
+            {
+                Map::MapControl.setSeen(kx, ky);
+                if(tile->id != TILE_SOLID && tile->id != TILE_NONE){
+                    mHasNewTiles = true;
+                }
+            }
+            if( !mHasEnemys ){ //Minimiza pesquisa em tiles quando inimigos encontrados
+                for(unsigned int i = 0; i < tile->obj.size();++i)
+                {
+                    if(tile->obj[i]->type == TYPE_ENEMY){
+                        mHasEnemys = true;
+                    }
+                }
+            }
+        }//End loop
+    }//End Loop
+
 }
 
 

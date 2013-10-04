@@ -115,7 +115,10 @@ std::string ResourceManager::addItemByIndex(int mapX, int mapY, int ID)
     for (auto &any : mItemMap ) {
         Item* item = &any.second;
 
-        if(!item) return "not found";
+        if(!item)
+        {
+            return "not found";
+        }
         if(i == ID)
         {
             Item* n_item = new Item( *item );

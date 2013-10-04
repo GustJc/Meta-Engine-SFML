@@ -1,16 +1,15 @@
 
-
-  Inimigos se matam!!!
-
-   Criar algoritmo de exploração
+ 
    
-   Popular Sistema de itens 
+   Arrumar moveRota para não apagar ao atacar inimigo.
+
+   Terminar algoritmo de exploração - Itens, Analise de Inimigos
    
-   Voltar a uma tela principal ao finalizar o jogo.
+   Criar Sistema de Inventórios
    
    Mostrar raio de visão. BeamFOV.
    
-   Bot usa visibilidade para mover-se
+   Inimigos usam visibilidade para mover-se
    
    Alertar quando ocorrer mudanças na visão do jogador(objetos se moverem)
    Alertar quando novos tiles explorados, para caso não haja, mudar de rota.

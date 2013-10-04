@@ -4,10 +4,11 @@
 Item::Item()
 {
     //ctor
-    mHp = mMp = mAtk = mDef = mGold = 0;
-    mIsBuff = true;
     type = TYPE_ITEM;
-
+    mIsBuff = true;
+    mHp = mAtk = 0;
+    mMp = mDef = 0;
+    mGold = 0;
     setTexture(TextureManager::TextureControl.get(Textures::ID::ITENS));
 }
 
@@ -53,6 +54,12 @@ void Item::useItem()
         Player::PlayerControl->mHP += mHp;
         Player::PlayerControl->mMP += mMp;
         Player::PlayerControl->mGold += mGold;
+    }
+    //temp, add status permanete
+    else
+    {
+        Player::PlayerControl->mAtk += mAtk;
+        Player::PlayerControl->mDef += mDef;
     }
 
     removeFromTileReference();

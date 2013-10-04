@@ -10,13 +10,13 @@
 #include <string>
 #include "Defines.h"
 #include "LuaManager.h"
-#include "StateGame.h"
-#include "LuaManager.h"
 #include "Entity.h"
 #include "Player.h"
 #include "ConsoleInfo.h"
 
 #include "ResourceManager.h"
+#include "StateGame.h"
+#include "StateMenu.h"
 
 using namespace std;
 
@@ -24,28 +24,22 @@ using namespace std;
 int GameManager::run(int argc, char* args[])
 {
     LuaManager::LuaControl.loadConfigs("config.lua", MAP_WIDTH, MAP_HEIGHT, TILE_SIZE);
-
     cout << "w=" << MAP_WIDTH << " h=" << MAP_HEIGHT << " ts=" << TILE_SIZE << endl;
 
-    MetaEngine& en = MetaEngine::EngineControl;
 
-    sf::Text t("", en.getFont());
-
-    sf::RenderWindow& window = en.getWindowReference();
+    sf::RenderWindow& window = MetaEngine::EngineControl.getWindowReference();
     window.setKeyRepeatEnabled(false);
 
-    sf::View& view = en.getViewGame();
+    sf::View& view = MetaEngine::EngineControl.getViewGame();
     view.setSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
     window.setView(view);
 
     loadMainTextures();
     LuaManager::LuaControl.startLua();
 
-    Map& myMap = Map::MapControl;
-    myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
 
-    Procedural procedural;
-    int mapType = 0;
+
+    Procedural& procedural = Procedural::ProceduralControl;
     for(int i = 0; i < argc; ++i)
     {
         string s = args[i];
@@ -72,7 +66,7 @@ int GameManager::run(int argc, char* args[])
         }
         else if(s.compare("-M") == 0)
         {
-            mapType = 1;
+            procedural.mapType = 1;
             cout << "Usando Miner" << endl;
         }
         else if(s.compare("-v") == 0 && i < (argc-1))
@@ -125,32 +119,18 @@ int GameManager::run(int argc, char* args[])
             TILE_SIZE = num;
         }
     }
-    switch(mapType){
-    case 0:
-        procedural.makeMap(myMap);
-        break;
-    case 1:
-        procedural.makeMapMiner(myMap);
-        break;
-    }
+
 
 
 
 // - - - - - - - - - - - Carrega estado inicial - - - - - - - - - - - -
-    mEstadoAtual = new StateGame(window);
+    mEstadoAtual = new StateMenu(window);
     mEstadoAtual->load();
 
     ConsoleInfo::MessageControl.init();
 
-
-
-
 // - - - - - - - Testes
     executeTests();
-
-
-
-
 
 // - - - - - - - - - - - Loop Principal - - - - - - - - - - - - - - - -
     sf::Clock tempoDecorrido;
@@ -171,14 +151,45 @@ int GameManager::run(int argc, char* args[])
         {
 
         case GST_LOSE:
-            cout << "You Lose!" << endl;
-            getchar();
+            {
+                cout << "You Lose!" << endl;
+                int mStack = mEstadoAtual->unload();
+                delete mEstadoAtual;
+                mEstadoAtual = new StateMenu(window);
+                mEstadoAtual->load(mStack);
+                break;
+            }
+        case GST_WIN:
+            {
+                cout << "You Win!" << endl;
+                int mStack = mEstadoAtual->unload();
+                delete mEstadoAtual;
+                mEstadoAtual = new StateMenu(window);
+                mEstadoAtual->load(mStack);
+                break;
+            }
         case GST_QUIT:
             mEstadoAtual->unload();
             delete mEstadoAtual;
             mEstadoAtual = nullptr;
             window.close();
             break;
+        case GST_GAME:
+            {
+                int mStack = mEstadoAtual->unload();
+                delete mEstadoAtual;
+                mEstadoAtual = new StateGame(window);
+                mEstadoAtual->load(mStack);
+                break;
+            }
+        case GST_MENU:
+            {
+                int mStack = mEstadoAtual->unload();
+                delete mEstadoAtual;
+                mEstadoAtual = new StateMenu(window);
+                mEstadoAtual->load(mStack);
+                break;
+            }
         case GST_NONE:
             break;
         default:
@@ -189,36 +200,11 @@ int GameManager::run(int argc, char* args[])
 
         //Limpa a tela
         window.clear();
-        sf::View& view = en.getViewGame();
-        view.setCenter(Player::PlayerControl->getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl->getPosition().y*TILE_SIZE-TILE_SIZE/4);
-        //view.setViewport(sf::FloatRect(0,0.2f, 1,1));
-        window.setView(view);
+
+
         //Desenha
-
-
-        t.setString("Hellow");
-        t.setPosition(10,10);
-        en.getWindowReference().draw(t);
-
         mEstadoAtual->render();
 
-/*
-        sf::Clock time1;
-        sf::Clock time2;
-
-        window.draw(circle);
-        time1.restart();
-        en.drawRect(10,10,100,100,sf::Color::Red);
-        std::cout << "Rectangle time: "<<  time1.getElapsedTime().asMicroseconds() << "\n";
-
-        time2.restart();
-        en.drawRectVertex(200,200,100,100,sf::Color::Red);
-        std::cout << "RectangleVertex time: " << time2.getElapsedTime().asMicroseconds() << "\n";
-*/
-
-
-
-        //window.draw(circle);
         window.display();
     }
     return 0;
@@ -244,10 +230,13 @@ GameManager::~GameManager()
     //dtor
 }
 
+
+// - - - - - - - Testes - - - - - - - - - - - - - - - - - - - - - -
 void GameManager::executeTests()
 {
     bool testResourceCreation   = false;
     bool testExploration        = false;
+    bool testManualCreation     = false;
     if(testResourceCreation)
     {
         Item* item = ResourceManager::ResourceControl.createItem("testPotion");
@@ -269,6 +258,27 @@ void GameManager::executeTests()
         Map::MapControl.forceRemoveMapFlag(Player::PlayerControl->getPositionX()-2, Player::PlayerControl->getPositionY(), EX_SEEN);
 
         LuaManager::LuaControl.doFile("./testes.lua");
+    }
+    if(testManualCreation)
+    {
+        Entity* enTest = new Entity(TYPE_ENEMY);
+        //As vezes cria fora do map e erro de seg
+        enTest->setPosition(Player::PlayerControl->getPosition().x+2, Player::PlayerControl->getPosition().y+1);
+        enTest->mSpeedCost = 200;
+        enTest->geraRota(Player::PlayerControl->getPosition().x, Player::PlayerControl->getPosition().y);
+        enTest->addToObjectList();
+        enTest->setTexture(TextureManager::TextureControl.get(Textures::ID::CHARS));
+        enTest->changeSprite(1,0);
+
+        Player::PlayerControl->setTexture(TextureManager::TextureControl.get(Textures::ID::CHARS));
+        Player::PlayerControl->changeSprite(0);
+
+        Item* item = new Item(3,0);
+        item->setPosition(Player::PlayerControl->getPosition().x-2, Player::PlayerControl->getPosition().y+1);
+        item->addToObjectList();
+
+        ResourceManager::ResourceControl.addGold(Player::PlayerControl->getPosition().x-1, Player::PlayerControl->getPosition().y-1,
+                                                 120);
     }
 }
 

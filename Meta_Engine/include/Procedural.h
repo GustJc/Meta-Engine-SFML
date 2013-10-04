@@ -6,8 +6,12 @@ class Procedural
         Procedural();
         virtual ~Procedural();
 
+        static Procedural ProceduralControl;
+
         void makeMap(Map& mMap);
         void makeMapMiner(Map& mMap);
+
+        int mapType;
 
         int n_Salas;
         int tamanho;

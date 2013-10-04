@@ -6,9 +6,12 @@
 #include "Player.h"
 #include "Entity.h"
 #include "ResourceManager.h"
+
+Procedural Procedural::ProceduralControl;
 using namespace std;
 Procedural::Procedural()
 {
+    mapType = 0;
     //ctor
     srand(time(0));
     n_Salas = 8;
@@ -81,11 +84,17 @@ void Procedural::makeMap(Map& mMap)
                 ResourceManager::ResourceControl.addGold(n_x, n_y, goldCreated);
                 cout << "Gold(" << n_x << "," << n_y << "): " << goldCreated << endl;
             } else
-            if(isChance(5.f))
+            if(isChance(8.f))
             {
                 std::string enemyCreated =
                     ResourceManager::ResourceControl.addEntityByIndex(n_x,n_y, rand() % 6);
                 cout << "Enemy(" << n_x << "," << n_y << "): " << enemyCreated << endl;
+            }else
+            if(isChance(40.f)) //40% é pouco pois encadeado
+            {
+                std::string itemCreated =
+                    ResourceManager::ResourceControl.addItemByIndex(n_x,n_y, rand() % 6);
+                cout << "Item(" << n_x << "," << n_y << "): " << itemCreated << endl;
             }
         }
 

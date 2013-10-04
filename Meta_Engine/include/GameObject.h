@@ -30,6 +30,8 @@ class GameObject
 
         void setTexture(sf::Texture& targetTexture);
         void changeSprite(int x, int y = -1);
+        int  getSpriteIdx();
+        int  getSpriteIdy();
 
         void addToObjectList();
         void removeFromObjectList();

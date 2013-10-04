@@ -20,7 +20,7 @@ class Tile
 
         int id;
         std::vector<GameObject*> obj;
-        int color;
+        int tipo;
     protected:
     private:
 };

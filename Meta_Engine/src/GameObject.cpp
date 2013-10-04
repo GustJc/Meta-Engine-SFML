@@ -96,16 +96,31 @@ void GameObject::setTexture(sf::Texture& targetTexture)
 
 void GameObject::changeSprite(int x, int y)
 {
-    assert(mSprite.getTexture() != nullptr);
     if(y < 0)
     {
-        int width = mSprite.getTexture()->getSize().x;
-        y =  x % width;
-        x =  x / width;
+        assert(mSprite.getTexture() != nullptr);
+        int textureSizeW = mSprite.getTexture()->getSize().x/TILE_SIZE;
+        y =  x % textureSizeW;
+        x =  x / textureSizeW;
     }
 
-    mSprite.setTextureRect(sf::IntRect(x*TILE_SIZE, (int)(y*TILE_SIZE*mSprite.getTexture()->getSize().x) ,
+
+    mSprite.setTextureRect(sf::IntRect(x*TILE_SIZE, (int)(y*TILE_SIZE) ,
                            TILE_SIZE, TILE_SIZE) );
+}
+
+int  GameObject::getSpriteIdx()
+{
+    if(mSprite.getTexture() == nullptr) return 0;
+
+    return mSprite.getTextureRect().left/TILE_SIZE;
+
+}
+int  GameObject::getSpriteIdy()
+{
+    if(mSprite.getTexture() == nullptr) return 0;
+
+    return mSprite.getTextureRect().top/TILE_SIZE;
 }
 
 void GameObject::draw()

@@ -18,13 +18,20 @@ class Player : public Entity
         void events(sf::Event& event);
         void startController();
         void resetMoved();
+        void resetPlayer();
+
+        virtual void movePosition(int x = 0, int y = 0);
 
         static Player* PlayerControl;
 
+        bool mHasWon;
         bool mHasMoved;
+        bool mHasNewTiles;
+        bool mHasEnemys;
         bool isBot;
 
         int mGold;
+        int mBotDelay;
     protected:
         void runBotAI();
 
