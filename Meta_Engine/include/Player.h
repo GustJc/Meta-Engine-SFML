@@ -27,7 +27,7 @@ class Player : public Entity
         bool mHasWon;
         bool mHasMoved;
         bool mHasNewTiles;
-        bool mHasEnemys;
+        int  mHasEnemys;
         bool isBot;
 
         int mGold;

@@ -12,5 +12,6 @@ class StateGame : public State
         void events(sf::Event& event);
         void render();
     protected:
+        void createNewMap();
     private:
 };

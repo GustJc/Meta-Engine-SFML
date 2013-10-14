@@ -26,7 +26,8 @@ void Player::resetPlayer()
     mSpeedCost = 100;
     type = TYPE_PLAYER;
     isBot = false;
-    mHasNewTiles = mHasEnemys = false;
+    mHasNewTiles = false;
+    mHasEnemys = 0;
     mHasWon = false;
     mAtk = 2;
     mDef = 1;
@@ -185,7 +186,8 @@ void Player::movePosition(int x, int y)
 {
     Entity::movePosition(x,y);
 
-    mHasNewTiles = mHasEnemys = false;
+    mHasNewTiles = false;
+    mHasEnemys = 0;
 
     Map::MapControl.setPassed(mPosition.x, mPosition.y);
 
@@ -211,14 +213,14 @@ void Player::movePosition(int x, int y)
                     mHasNewTiles = true;
                 }
             }
-            if( !mHasEnemys ){ //Minimiza pesquisa em tiles quando inimigos encontrados
-                for(unsigned int i = 0; i < tile->obj.size();++i)
-                {
-                    if(tile->obj[i]->type == TYPE_ENEMY){
-                        mHasEnemys = true;
-                    }
+
+            for(unsigned int i = 0; i < tile->obj.size();++i)
+            {
+                if(tile->obj[i]->type == TYPE_ENEMY){
+                    mHasEnemys++;
                 }
             }
+
         }//End loop
     }//End Loop
 

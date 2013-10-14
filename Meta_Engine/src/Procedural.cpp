@@ -82,19 +82,19 @@ void Procedural::makeMap(Map& mMap)
             if(isChance(20.f)){
                 int goldCreated = rand() % 100;
                 ResourceManager::ResourceControl.addGold(n_x, n_y, goldCreated);
-                cout << "Gold(" << n_x << "," << n_y << "): " << goldCreated << endl;
+                //cout << "Gold(" << n_x << "," << n_y << "): " << goldCreated << endl;
             } else
             if(isChance(8.f))
             {
                 std::string enemyCreated =
                     ResourceManager::ResourceControl.addEntityByIndex(n_x,n_y, rand() % 6);
-                cout << "Enemy(" << n_x << "," << n_y << "): " << enemyCreated << endl;
+                //cout << "Enemy(" << n_x << "," << n_y << "): " << enemyCreated << endl;
             }else
             if(isChance(40.f)) //40% é pouco pois encadeado
             {
                 std::string itemCreated =
                     ResourceManager::ResourceControl.addItemByIndex(n_x,n_y, rand() % 6);
-                cout << "Item(" << n_x << "," << n_y << "): " << itemCreated << endl;
+                //cout << "Item(" << n_x << "," << n_y << "): " << itemCreated << endl;
             }
         }
 

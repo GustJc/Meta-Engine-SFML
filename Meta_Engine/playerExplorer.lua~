@@ -209,25 +209,28 @@ end
 --Muda rota se chegar no destino. Tiver inimigos na visão.
 --Ou não possuir novos tiles explorados
 function checkExplore()
-  
-  if player.mHasNewTiles == false then
-    print('Sem tiles novos, possivel beco.')
-    return false
-  end
-  
+    
   if player:isRota() then 
-    print('Rota ainda e valida, movendo.')
+    local posTarget = player:getRotaTarget()
+    --Se não houver tiles novos, e estiver vendo o destino, beco.
+    if player.mHasNewTiles == false and map:has_seens(posTarget.x, posTarget.y) then
+      print('Sem tiles novos, possivel beco.')
+      return false
+    end
+    --print('N_Enemy/ENEMY ... ' .. n_enemy ..','..player.mHasEnemys)
+    if player.mHasEnemys ~= n_enemy then
+      print('Inimigo novo avistado, explorando opções.')
+      return false
+    end
+    --print('Rota ainda e valida, movendo.')
     return true
   end
   
-  if player.mHasEnemys then
-    print('Inimigo avistado, explorando opções.')
-    return false
-  end
+  
   
     
   
-  print('Chegou ao alvo, obtendo nova rota..')
+  --print('Chegou ao alvo, obtendo nova rota..')
   return false
 
 end
@@ -263,6 +266,9 @@ function autoExplore()
 	local item_greed = 5      -- numero de passos disposto a se mover para pegar um item ao inves de explorar um tiel
   local fear_factor = 2     -- numero de inimigos por perto máximo para executar um ataque.
   -- Realizar conta de fear_factor baseado em atk,def,hp do inimigo futuramente
+  -- Fazer com que fugir não entre num loop
+  
+  n_enemy = player.mHasEnemys
   
   while running do
     local cardinal_tiles = {}
@@ -320,13 +326,13 @@ function autoExplore()
 						    if is_singlet then
 							    unseen_singlets[#unseen_singlets + 1] = c
 							    ----map:setTile(x,y,-1,7)
-							    print("singlet")
+							    --print("singlet")
 						    end
 						  else --Se já tile visto e não for bloco, propaga para proxima iteração
 					      --Se objeto for um item, adiciona a lista de itens
                 local obj = map:getObj(x, y, 0)
                 
-				        if obj 
+				        if obj then
 				          if obj.type == Obj.ITEM then
 					          unseen_items[#unseen_items + 1] = c
 					          values[c] = iter
@@ -428,7 +434,7 @@ function autoExplore()
 		  end -- for Tiles
 		end -- fim if Choices
 		
-    print('escolhendo alvos(#' .. #choices ..' alvos)')
+    --print('escolhendo alvos(#' .. #choices ..' alvos)')
     if #choices > 1 then
       local choices2 = {}
       for _, c in ipairs(choices) do
@@ -455,7 +461,7 @@ function autoExplore()
 		    t_x, t_y = toDouble(priorityChoise[1])
 		  end
 		  
-		  print('alvo escolhido(' .. t_x .. ',' .. t_y .. ')')
+		  --print('alvo escolhido(' .. t_x .. ',' .. t_y .. ')')
 		  player:geraRota(t_x,t_y)
 		  player:moveRota()
 		end

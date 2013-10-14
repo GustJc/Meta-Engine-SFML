@@ -9,6 +9,11 @@ typedef struct mapData
     bool win        = false;
 }_mapData;
 
+
+enum {
+        GAME_START=0, GAME_LOAD=1, GAME_SAVE=2, GAME_RESET_LOAD=3, GAME_RESET_START=4
+};
+
 class DataHolder
 {
     public:
@@ -21,6 +26,14 @@ class DataHolder
         void addData(mapData data = RunData);
         void clearData();
         void analyseData();
+
+        void resetCount();
+
+        //Dados
+        int mRun;
+        int mMaps;
+        int mRunCount;
+        int mMapsCount;
     protected:
 
 

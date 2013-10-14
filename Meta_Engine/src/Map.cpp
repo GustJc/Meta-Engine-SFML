@@ -14,20 +14,6 @@ Map Map::MapControl;
 Map::Map()
 {
     //ctor
-
-    int a = 0;
-    setFlag(a, EX_SEEN);
-    a = 0;
-
-    if(isFlag(a, EX_HAS_SEEN | EX_SEEN) )
-        cout << "isSEEN!\n";
-
-    removeFlag(a, EX_SEEN);
-
-    if(isFlag(a, EX_SEEN) )
-        cout << "SEEN AGAIN\n";
-    if(isFlag(a, EX_HAS_SEEN) )
-        cout << "SEEN NO AGAIN\n";
 }
 
 Map::~Map()
@@ -53,8 +39,6 @@ void Map::createMap(int sizeW, int sizeH)
     {
         exploreMap[i].resize(sizeH, 0);
     }
-
-    //std::cout << tileMap.size() << "-" << tileMap[0].size() << std::endl;
 }
 void Map::clearMap()
 {
@@ -134,7 +118,7 @@ bool Map::loadMap(std::string filename)
             myfile >> range; myfile.ignore(3,',');
             myfile >> speed; myfile.ignore(3,',');
             myfile >> sprIdx; myfile.ignore(3,',');
-            myfile >> sprIdy; myfile.ignore(3,',');
+            myfile >> sprIdy; myfile.ignore(1,',');
 
             Entity* ent = new Entity();
             ent->setPosition(px,py);
@@ -146,12 +130,13 @@ bool Map::loadMap(std::string filename)
             ent->changeSprite(sprIdx, sprIdy);
 
             ent->addToObjectList();
+
         }else
         if(strcasecmp(str.c_str(), "Gold:") == 0)
         {
             myfile >> px; myfile.ignore(3,',');
             myfile >> py; myfile.ignore(3,',');
-            myfile >> hp; myfile.ignore(3,',');
+            myfile >> hp; myfile.ignore(1,',');
 
             ResourceManager::ResourceControl.addGold(px,py,hp);
         } else
@@ -165,7 +150,7 @@ bool Map::loadMap(std::string filename)
             myfile >> atk; myfile.ignore(3,',');
             myfile >> def; myfile.ignore(3,',');
             myfile >> sprIdx; myfile.ignore(3,',');
-            myfile >> sprIdy; myfile.ignore(3,',');
+            myfile >> sprIdy; myfile.ignore(1,',');
 
             Item* item = new Item();
             item->setPosition(px,py);
@@ -183,10 +168,11 @@ bool Map::loadMap(std::string filename)
     return true;
 }
 
-void Map::saveMap()
+void Map::saveMap(std::string filename)
 {
     ofstream file;
-    file.open ("./data/map/output_map.map",ios::out | ios::binary);
+    string absFileName("./data/map/"+filename);
+    file.open( absFileName.c_str(),ios::out | ios::binary);
 
     int map_width = getMapWidth();
     int map_height = getMapHeight();
@@ -241,7 +227,7 @@ void Map::saveMap()
             }
         } //Fim item
     } //Fim for
-
+    file << "\n";
     file.close();
 
 }

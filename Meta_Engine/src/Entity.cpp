@@ -136,9 +136,8 @@ void Entity::movePosition(int px, int py)
         if((type == TYPE_PLAYER && tile->obj[i]->type == TYPE_ENEMY) ||
            (type == TYPE_ENEMY && tile->obj[i]->type == TYPE_PLAYER) )
         {
-            //attack(mPosition.x + px, mPosition.y + py);
             Entity* ent = (Entity*)tile->obj[i];
-            cout << "Atacando inimigo (" << mAtk << "-" << ent->mDef << ")\n";
+            //cout << "Atacando inimigo (" << mAtk << "-" << ent->mDef << ")\n";
 
             int dano = mAtk - ent->mDef;
             if(dano > 0){
@@ -156,7 +155,7 @@ void Entity::movePosition(int px, int py)
                 stream << "Inimigo te ataca com " << dano << " de dano!";
                 ConsoleInfo::MessageControl.addMessage( stream.str() );
             }
-            cout << "Dano: " << dano << " Defensor HP: " << ent->mHP << endl;
+            //cout << "Dano: " << dano << " Defensor HP: " << ent->mHP << endl;
             return;
         }
         else
@@ -230,6 +229,19 @@ void Entity::moveRota()
 
     RotaList.erase(RotaList.end());
 }
+
+//----------------- Get Route --------------------------------------
+sf::Vector2i Entity::getRotaTarget()
+{
+    sf::Vector2i target;
+    if(RotaList.empty() == false)
+    {
+        target = RotaList[0];
+    }
+    //Se não existir, retorna (0,0)
+    return target;
+}
+
 
 //----------------- Get Route --------------------------------------
 void Entity::geraRota(int dx, int dy)

@@ -11,6 +11,8 @@
 #include "Procedural.h"
 #include "DataHolder.h"
 
+#include <sstream>
+
 StateGame::StateGame(sf::RenderWindow& wnd) :
 State(wnd)
 {
@@ -25,14 +27,71 @@ StateGame::~StateGame()
 void StateGame::load(int stack)
 {
     mStack = stack;
-    if(mStack != 3){
+    if(mStack != GAME_RESET_START && mStack != GAME_RESET_LOAD){
         DataHolder::DataControl.clearData();
     }else
     { //Recarrega mapa, mas não libera data
-        mStack = 1;
+        if(mStack == GAME_RESET_LOAD) {
+            mStack = GAME_LOAD;
+        } else
+        if(mStack == GAME_RESET_START) {
+            mStack = GAME_START;
+        }
     }
 
-    if(mStack == 1)
+    if(mStack == GAME_START)
+    {
+        Player::PlayerControl->isBot = true;
+        if(DataHolder::DataControl.mMapsCount == 0)
+        {
+            createNewMap();
+            DataHolder::DataControl.mMapsCount++;
+            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount;
+            Map::MapControl.saveMap(mstr.str());
+        }
+        else if (DataHolder::DataControl.mRunCount+1 <= DataHolder::DataControl.mRun)
+        {
+            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount;
+            if( Map::MapControl.loadMap(mstr.str()) == false )
+            {
+                mStack = -1;
+                mStado = GST_MENU;
+                return;
+            }
+                Player::PlayerControl->movePosition(0,0);
+        }
+        DataHolder::DataControl.mRunCount++;
+        //cout << "mRunCount " << DataHolder::DataControl.mRunCount << " de " << DataHolder::DataControl.mRun << endl;
+
+        if(DataHolder::DataControl.mRunCount > DataHolder::DataControl.mRun)
+        {
+
+            DataHolder::DataControl.mMapsCount++;
+            //cout << "mMAPCount " << DataHolder::DataControl.mMapsCount << " de " << DataHolder::DataControl.mMaps << endl;
+            if(DataHolder::DataControl.mMapsCount > DataHolder::DataControl.mMaps)
+            {
+                DataHolder::DataControl.analyseData();
+                mStado = GST_MENU;
+                return;
+            } else
+            {
+                cout << "New Map!" << endl;
+            }
+            DataHolder::DataControl.analyseData();
+            DataHolder::DataControl.mRunCount=0;
+            createNewMap();
+            Player::PlayerControl->isBot = true;
+            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount;
+            Map::MapControl.saveMap(mstr.str());
+        }
+        else
+        {
+            cout << "New Game!" << endl;
+        }
+
+    }
+    else
+    if(mStack == GAME_LOAD)
     {
         if( Map::MapControl.loadMap("output_map.map") == false )
         {
@@ -42,24 +101,11 @@ void StateGame::load(int stack)
         }
 
         Player::PlayerControl->movePosition(0,0);
-    }else
-    {
-        Map& myMap = Map::MapControl;
-        myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
-
-        switch(Procedural::ProceduralControl.mapType){
-        case 0:
-            Procedural::ProceduralControl.makeMap(myMap);
-            break;
-        case 1:
-            Procedural::ProceduralControl.makeMapMiner(myMap);
-            break;
-        }
-
-        Player::PlayerControl->movePosition(0,0);
     }
-    if(mStack == 2)
+    else
+    if(mStack == GAME_SAVE)
     {
+        createNewMap();
         Map::MapControl.saveMap();
     }
 
@@ -67,6 +113,24 @@ void StateGame::load(int stack)
     view.setCenter(Player::PlayerControl->getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl->getPosition().y*TILE_SIZE-TILE_SIZE/4);
     window.setView(view);
 }
+
+void StateGame::createNewMap()
+{
+    Map& myMap = Map::MapControl;
+    myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
+
+    switch(Procedural::ProceduralControl.mapType){
+    case 0:
+        Procedural::ProceduralControl.makeMap(myMap);
+        break;
+    case 1:
+        Procedural::ProceduralControl.makeMapMiner(myMap);
+        break;
+    }
+
+    Player::PlayerControl->movePosition(0,0);
+}
+
 
 int StateGame::unload()
 {
@@ -133,11 +197,18 @@ eStateType StateGame::update(unsigned int dt)
     if(Player::PlayerControl->mDead)
     {
         DataHolder::DataControl.addData();
-        if(mStack == 1)
+        if(mStack == GAME_START)
         {
-            unload();
-            load(3);
             cout << "Lose\n";
+            unload();
+            load(GAME_RESET_START);
+            return GST_NONE;
+        }else
+        if(mStack == GAME_LOAD)
+        {
+            cout << "Lose\n";
+            unload();
+            load(GAME_RESET_LOAD);
             return GST_NONE;
         }
         return GST_LOSE;
@@ -149,11 +220,18 @@ eStateType StateGame::update(unsigned int dt)
     {
         DataHolder::RunData.win = true;
         DataHolder::DataControl.addData();
-        if(mStack == 1)
+        if(mStack == GAME_START)
         {
-            unload();
-            load(3);
             cout << "Win\n";
+            unload();
+            load(GAME_RESET_START);
+            return GST_NONE;
+        }else
+        if(mStack == GAME_LOAD)
+        {
+            cout << "Win\n";
+            unload();
+            load(GAME_RESET_LOAD);
             return GST_NONE;
         }
         return GST_WIN;

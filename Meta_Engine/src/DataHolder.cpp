@@ -7,12 +7,22 @@ DataHolder DataHolder::DataControl;
 DataHolder::DataHolder()
 {
     //ctor
+    mRun = 5;
+    mMaps = 1;
+    resetCount();
 }
 
 DataHolder::~DataHolder()
 {
     //dtor
 }
+
+void DataHolder::resetCount()
+{
+    mRunCount = mMapsCount = 0;
+}
+
+
 void DataHolder::clearData()
 {
     mRunDataList.clear();

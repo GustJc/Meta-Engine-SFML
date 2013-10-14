@@ -28,7 +28,7 @@ class Map
 
         void createMap(int sizeW, int sizeH);
         bool loadMap(std::string filename);
-        void saveMap();
+        void saveMap(std::string filename = "output_map.map");
         void clearMap();
         void setTile(int x, int y, int tileID, int tileColor);
         Tile* getTile(int x, int y);

@@ -27,6 +27,7 @@ class Entity : public GameObject
         int mRange;
         std::vector<sf::Vector2i> RotaList;
 
+        sf::Vector2i getRotaTarget();
         void geraRota(int dx, int dy);
         bool isRota();
         void moveRota();

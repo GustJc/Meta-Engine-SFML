@@ -115,6 +115,7 @@ luabind::scope LuaManager::bindClasses()
         .def("move", (void (Entity::*)(int))&Entity::movePosition)
         .def("geraRota", &Entity::geraRota)
         .def("isRota", &Entity::isRota)
+        .def("getRotaTarget", &Entity::getRotaTarget)
         .def("moveRota", &Entity::moveRota),
 
     luabind::class_<Player, Entity>("Player")

@@ -48,7 +48,7 @@ ConsoleInfo::~ConsoleInfo()
 //------------------ Process Command -----------------------------------------------------------------------
 void ConsoleInfo::processCommand()
 {
-    cout << mString.str() << endl;
+    //cout << mString.str() << endl;
 
     mConsoleLog.push_back(sf::Text(mString.str(), MetaEngine::EngineControl.getFont(), 12) );
 
@@ -99,7 +99,7 @@ void ConsoleInfo::events(const sf::Event& event)
                     if(pos != (int)mString.str().length())
                     {
                         string str(mString.str().substr(pos));
-                        cout << str << endl;
+                        //cout << str << endl;
                         mString << static_cast<char>(event.text.unicode);
                         mString << str;
                         mString.seekp(pos+1,ios::beg);
@@ -300,7 +300,7 @@ bool ConsoleInfo::executeCommand(std::string str)
 
     if(tokens.size() <= 1) return false;
 
-        cout << "Cmd: " << tokens[1] << endl;
+        //cout << "Cmd: " << tokens[1] << endl;
         if(tokens[1].compare("setFog") == 0)
         {
             if(tokens.size() <= 2)
