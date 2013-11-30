@@ -6,7 +6,8 @@
 #include "Player.h"
 #include "Entity.h"
 #include "ResourceManager.h"
-
+#include <stdlib.h>
+#include <time.h>
 Procedural Procedural::ProceduralControl;
 using namespace std;
 Procedural::Procedural()
@@ -262,7 +263,8 @@ void Procedural::makeMapMiner(Map& mMap)
 
 bool Procedural::isChance(float chance)
 {
-    float mChance = (float)( (rand() % 1000000) + 1) / 10000.f;
+    float mChance = (float)( (rand() % 10000) + 1);
+    mChance /= 100.f;
     //cout << "Chance is: " << mChance << " of " << chance << endl;
 
     return (mChance < chance);

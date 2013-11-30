@@ -46,21 +46,21 @@ int GameManager::run(int argc, char* args[])
         if(s.compare("-s") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando numero de salas: " << num << endl;
             procedural.n_Salas = num;
         }
         else if(s.compare("-w") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando tamanho minimo: " << num << endl;
             procedural.min_width = num;
         }
         else if(s.compare("-W") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando tamanho maximo: " << num << endl;
             procedural.max_width = num;
         }
@@ -72,49 +72,49 @@ int GameManager::run(int argc, char* args[])
         else if(s.compare("-v") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando Vida minimo: " << num << endl;
             procedural.vida_min = num;
         }
         else if(s.compare("-V") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando Vida maximo: " << num << endl;
             procedural.vida_max = num;
         }
         else if(s.compare("-c") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando chance(total 10.000) de spawn: " << num << endl;
             procedural.chance_spawn = num;
         }
         else if(s.compare("-t") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando total life: " << num << endl;
             procedural.total_life = num;
         }
         else if(s.compare("-map-w") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando map width: " << num << endl;
             MAP_WIDTH = num;
         }
         else if(s.compare("-map-h") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando map height: " << num << endl;
             MAP_HEIGHT = num;
         }
         else if(s.compare("-map-tile") == 0 && i < (argc-1))
         {
             string s2 = args[i+1];
-            int num = std::stoi(s2);
+            int num = atoi(s2.c_str());
             cout << "Usando map height: " << num << endl;
             TILE_SIZE = num;
         }
@@ -131,7 +131,7 @@ int GameManager::run(int argc, char* args[])
 
 // - - - - - - - Testes
     executeTests();
-
+    window.setFramerateLimit(60);
 // - - - - - - - - - - - Loop Principal - - - - - - - - - - - - - - - -
     sf::Clock tempoDecorrido;
     while(window.isOpen()){

@@ -108,7 +108,7 @@ bool Map::loadMap(std::string filename)
     while (myfile.eof() == false) //Le a linha
     {
         myfile >> str;
-        if(strcasecmp(str.c_str(), "Enemy:") == 0)
+        if(strcmp(str.c_str(), "Enemy:") == 0)
         {
             myfile >> px; myfile.ignore(3,',');
             myfile >> py; myfile.ignore(3,',');
@@ -132,7 +132,7 @@ bool Map::loadMap(std::string filename)
             ent->addToObjectList();
 
         }else
-        if(strcasecmp(str.c_str(), "Gold:") == 0)
+        if(strcmp(str.c_str(), "Gold:") == 0)
         {
             myfile >> px; myfile.ignore(3,',');
             myfile >> py; myfile.ignore(3,',');
@@ -140,7 +140,7 @@ bool Map::loadMap(std::string filename)
 
             ResourceManager::ResourceControl.addGold(px,py,hp);
         } else
-        if(strcasecmp(str.c_str(), "Item:") == 0)
+        if(strcmp(str.c_str(), "Item:") == 0)
         {
             myfile >> px; myfile.ignore(3,',');
             myfile >> py; myfile.ignore(3,',');
