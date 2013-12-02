@@ -46,12 +46,12 @@ void StateGame::load(int stack)
         {
             createNewMap();
             DataHolder::DataControl.mMapsCount++;
-            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount;
+            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount << "_" << DataHolder::DataControl.mMapsCount;
             Map::MapControl.saveMap(mstr.str());
         }
         else if (DataHolder::DataControl.mRunCount+1 <= DataHolder::DataControl.mRun)
         {
-            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount;
+            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount << "_" << DataHolder::DataControl.mMapsCount;
             if( Map::MapControl.loadMap(mstr.str()) == false )
             {
                 mStack = -1;
@@ -81,8 +81,10 @@ void StateGame::load(int stack)
             DataHolder::DataControl.mRunCount=0;
             createNewMap();
             Player::PlayerControl->isBot = true;
-            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount;
+            stringstream mstr; mstr << "testmap_" << DataHolder::DataControl.mMapsCount << "_" << DataHolder::DataControl.mMapsCount;
             Map::MapControl.saveMap(mstr.str());
+            DataHolder::DataControl.clearData();
+            DataHolder::DataControl.mRunCount++;
         }
         else
         {
