@@ -2,3 +2,8 @@
 /Meta_Engine/Meta Engine SFML.layout
 /Meta_Engine/obj
 /Meta_Engine/ValgrindOut.xml
+/Meta_Engine/Meta\ Engine\ SFML_build_log.html
+/Meta_Engine/data/map/testmap*
+
+#temporary
+/Meta_Engine/Meta\ Engine\ SFML.cbp
