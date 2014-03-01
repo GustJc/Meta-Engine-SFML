@@ -7,5 +7,5 @@
 
 #temporary
 /Meta_Engine/Meta\ Engine\ SFML.cbp
-
-*.*~
+/Meta_Engine/data/map/test*
+/*.*~
