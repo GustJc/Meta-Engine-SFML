@@ -29,6 +29,9 @@ class DataHolder
 
         void resetCount();
 
+
+        mapData mIdealData;
+
         //Dados
         int mRun;
         int mMaps;
