@@ -1,5 +1,0 @@
--- define tamanho do mapa
-width = 80
-height = 60
-tile_size = 8
-
