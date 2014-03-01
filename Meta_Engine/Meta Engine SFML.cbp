@@ -5,7 +5,7 @@
 		<Option title="Meta Engine SFML" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Game/;Main/;Engine/;Map/;Procedural/;Stados/Base/;Depreciado/;Stados/;" />
+		<Option virtualFolders="Main/;Main/Map/;Game/;Depreciado/;Stados/;Procedural/;Engine/;Stados/Base/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="Meta_Engine_SFML" prefix_auto="1" extension_auto="1" />
@@ -40,7 +40,7 @@
 			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="include/DataHolder.h">
-			<Option virtualFolder="Map/" />
+			<Option virtualFolder="Main/Map/" />
 		</Unit>
 		<Unit filename="include/Defines.h">
 			<Option virtualFolder="Main/" />
@@ -64,7 +64,7 @@
 			<Option virtualFolder="Game/" />
 		</Unit>
 		<Unit filename="include/Map.h">
-			<Option virtualFolder="Map/" />
+			<Option virtualFolder="Main/Map/" />
 		</Unit>
 		<Unit filename="include/MetaEngine.h">
 			<Option virtualFolder="Engine/" />
@@ -94,13 +94,13 @@
 			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="include/Tile.h">
-			<Option virtualFolder="Map/" />
+			<Option virtualFolder="Main/Map/" />
 		</Unit>
 		<Unit filename="src/ConsoleInfo.cpp">
 			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="src/DataHolder.cpp">
-			<Option virtualFolder="Map/" />
+			<Option virtualFolder="Main/Map/" />
 		</Unit>
 		<Unit filename="src/Defines.cpp">
 			<Option virtualFolder="Main/" />
@@ -127,7 +127,7 @@
 			<Option virtualFolder="Main/" />
 		</Unit>
 		<Unit filename="src/Map.cpp">
-			<Option virtualFolder="Map/" />
+			<Option virtualFolder="Main/Map/" />
 		</Unit>
 		<Unit filename="src/MetaEngine.cpp">
 			<Option virtualFolder="Engine/" />
@@ -157,7 +157,7 @@
 			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="src/Tile.cpp">
-			<Option virtualFolder="Map/" />
+			<Option virtualFolder="Main/Map/" />
 		</Unit>
 		<Extensions>
 			<code_completion />
