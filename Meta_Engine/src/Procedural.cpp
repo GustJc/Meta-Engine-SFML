@@ -136,7 +136,7 @@ void Procedural::makeMap(Map& mMap)
         if(i == mSalas.size()-1)
         {
             mMap.setTile(mSalas[i].x, mSalas[i].y, TILE_FLOOR, 4);
-            mMap.getTile(mSalas[i].x, mSalas[i].y)->id = TILE_FINISH_LV;
+            mMap.getTile(mSalas[i].x, mSalas[i].y)->gfx = TILE_FINISH_LV;
         } else
         {
             mMap.setTile(mSalas[i].x, mSalas[i].y, TILE_FLOOR, 2);
@@ -223,13 +223,13 @@ void Procedural::makeMapMiner(Map& mMap)
                 }
                 tile = mMap.getTile(m_x, m_y);
                 //Se for solido, pode cavar
-                if(tile != nullptr && tile->id == TILE_SOLID) {
+                if(tile != nullptr && tile->gfx == TILE_SOLID) {
                     checking_pos = false;
                 }
 
             }
 
-            if(tile != nullptr && tile->id == TILE_SOLID){
+            if(tile != nullptr && tile->gfx == TILE_SOLID){
                 mMap.setTile(m_x,m_y,TILE_FLOOR,3);
                 life--;
                 mMiner[i].x = m_x;

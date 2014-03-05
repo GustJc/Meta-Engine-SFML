@@ -5,7 +5,7 @@
 		<Option title="Meta Engine SFML" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Main/;Main/Map/;Game/;Depreciado/;Stados/;Procedural/;Engine/;Stados/Base/;" />
+		<Option virtualFolders="Game/;Stados/;Main/Map/;Procedural/;Engine/;Stados/Base/;Main/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="Meta_Engine_SFML" prefix_auto="1" extension_auto="1" />
@@ -36,6 +36,9 @@
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="include/Animation.h">
+			<Option virtualFolder="Game/" />
+		</Unit>
 		<Unit filename="include/ConsoleInfo.h">
 			<Option virtualFolder="Engine/" />
 		</Unit>
@@ -54,14 +57,11 @@
 		<Unit filename="include/GameObject.h">
 			<Option virtualFolder="Game/" />
 		</Unit>
-		<Unit filename="include/InputManager.h">
-			<Option virtualFolder="Depreciado/" />
-		</Unit>
 		<Unit filename="include/Item.h">
 			<Option virtualFolder="Game/" />
 		</Unit>
 		<Unit filename="include/LuaManager.h">
-			<Option virtualFolder="Game/" />
+			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="include/Map.h">
 			<Option virtualFolder="Main/Map/" />
@@ -71,9 +71,6 @@
 		</Unit>
 		<Unit filename="include/Player.h">
 			<Option virtualFolder="Game/" />
-		</Unit>
-		<Unit filename="include/PlayerBot.h">
-			<Option virtualFolder="Depreciado/" />
 		</Unit>
 		<Unit filename="include/Procedural.h">
 			<Option virtualFolder="Procedural/" />
@@ -96,6 +93,9 @@
 		<Unit filename="include/Tile.h">
 			<Option virtualFolder="Main/Map/" />
 		</Unit>
+		<Unit filename="src/Animation.cpp">
+			<Option virtualFolder="Game/" />
+		</Unit>
 		<Unit filename="src/ConsoleInfo.cpp">
 			<Option virtualFolder="Engine/" />
 		</Unit>
@@ -106,16 +106,13 @@
 			<Option virtualFolder="Main/" />
 		</Unit>
 		<Unit filename="src/Entity.cpp">
-			<Option virtualFolder="Stados/" />
+			<Option virtualFolder="Game/" />
 		</Unit>
 		<Unit filename="src/GameManager.cpp">
 			<Option virtualFolder="Stados/" />
 		</Unit>
 		<Unit filename="src/GameObject.cpp">
 			<Option virtualFolder="Game/" />
-		</Unit>
-		<Unit filename="src/InputManager.cpp">
-			<Option virtualFolder="Depreciado/" />
 		</Unit>
 		<Unit filename="src/Item.cpp">
 			<Option virtualFolder="Game/" />
@@ -134,9 +131,6 @@
 		</Unit>
 		<Unit filename="src/Player.cpp">
 			<Option virtualFolder="Game/" />
-		</Unit>
-		<Unit filename="src/PlayerBot.cpp">
-			<Option virtualFolder="Depreciado/" />
 		</Unit>
 		<Unit filename="src/Procedural.cpp">
 			<Option virtualFolder="Procedural/" />

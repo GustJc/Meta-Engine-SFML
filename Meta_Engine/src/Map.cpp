@@ -22,7 +22,7 @@ Map::~Map()
     tileMap.clear();
 }
 
-void Map::createMap(int sizeW, int sizeH)
+void Map::createMap(int sizeW, int sizeH, int defaultType, int defaultGfx)
 {
     assert(tileMap.empty());
 
@@ -33,7 +33,7 @@ void Map::createMap(int sizeW, int sizeH)
 
     for(int i = 0; i < sizeW; ++i)
     {
-        tileMap[i].resize(sizeH);
+        tileMap[i].resize(sizeH, Tile());
     }
     for(int i = 0; i < sizeW; ++i)
     {
@@ -90,7 +90,7 @@ bool Map::loadMap(std::string filename)
         for (int x = 0; x < map_width; x++)
         {   // Le Tiles e joga-os no TileList
             Tile tempTile;
-            myfile >> tempTile.id; myfile.ignore(1,':');
+            myfile >> tempTile.gfx; myfile.ignore(1,':');
             myfile >> tempTile.tipo;
 
 
@@ -186,7 +186,7 @@ void Map::saveMap(std::string filename)
         for (int x = 0; x < map_width; x++)
         {
 
-            file << tileMap[x][y].id << ":" << tileMap[x][y].tipo;
+            file << tileMap[x][y].gfx << ":" << tileMap[x][y].tipo;
             file << " ";
         }
         file << "\n";
@@ -241,7 +241,8 @@ void Map::draw()
         for(unsigned int j = 0; j < tileMap[i].size();++j)
         {
             if(MetaEngine::EngineControl.isMapFog() &&
-                   !has_seens(i,j)) continue;
+                   !has_seens(i,j) && !has_remembers(i,j)
+                    ) continue;
 
             Tile& tile = tileMap[i][j];
 
@@ -271,6 +272,12 @@ void Map::draw()
             {
                 int tileImg = tile.tipo;
                 if(tileImg == 0) continue;
+
+                int alpha = 255;
+                if(isFlag(exploreMap[i][j], EX_HAS_SEEN) && !isFlag(exploreMap[i][j], EX_SEEN) ) {
+                    alpha = 150;
+                }
+                mSprite.setColor(sf::Color(255, 255, 255, alpha));
                 mSprite.setPosition(i*TILE_SIZE, j*TILE_SIZE);
                 mSprite.setTextureRect(sf::IntRect(tileImg*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
                 MetaEngine::EngineControl.getWindowReference().draw(mSprite);
@@ -280,7 +287,7 @@ void Map::draw()
 }
 
 
-void Map::setTile(int x, int y, int tileID, int tileColor)
+void Map::setTile(int x, int y, int tileGfx, int tileColor)
 {
     if(tileMap.empty())
     {
@@ -292,8 +299,8 @@ void Map::setTile(int x, int y, int tileID, int tileColor)
           //  (tileMap[0].size()-1) << std::endl;
         return;
     }
-    if(tileID >=0){
-        tileMap[x][y].id = tileID;
+    if(tileGfx >=0){
+        tileMap[x][y].gfx = tileGfx;
     }
     tileMap[x][y].tipo = tileColor;
 }
@@ -323,14 +330,19 @@ void Map::setSprite(sf::Texture& texture)
     mSprite.setTexture(texture);
 }
 
-GameObject* Map::getObj(int x, int y, int index)
+GameObject* Map::getObj(int x, int y)
+{
+    return tileMap[x][y].obj;
+}
+
+GameObject* Map::getItem(int x, int y, int index)
 {
     if (x < 0 || y < 0) return nullptr;
     if (x >= getMapWidth() || y >= getMapHeight() ) return nullptr;
 
-    if(tileMap[x][y].obj.empty() || index >= (int)tileMap[x][y].obj.size() || index < 0) return nullptr;
+    if(tileMap[x][y].itens.empty() || index >= (int)tileMap[x][y].itens.size() || index < 0) return nullptr;
 
-    return tileMap[x][y].obj[index];
+    return tileMap[x][y].itens[index];
 }
 
 GameObject* Map::getIfObj(int x, int y, int typeObj)
@@ -338,10 +350,10 @@ GameObject* Map::getIfObj(int x, int y, int typeObj)
     if (x < 0 || y < 0) return nullptr;
     if (x >= getMapWidth() || y >= getMapHeight() ) return nullptr;
 
-    for(unsigned int i = 0; i < tileMap[x][y].obj.size(); ++i)
+    for(unsigned int i = 0; i < tileMap[x][y].itens.size(); ++i)
     {
-        if(tileMap[x][y].obj[i]->type == typeObj){
-            return tileMap[x][y].obj[i];
+        if(tileMap[x][y].itens[i]->type == typeObj){
+            return tileMap[x][y].itens[i];
         }
     }
     return nullptr;
@@ -364,24 +376,24 @@ void Map::removeFlag(int& flags, int f){
 //Lua maps
 bool Map::has_seens(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return false;
-    if(y < 0 || y > (int)tileMap[0].size()) return false;
+    if(x < 0 || x >= (int)tileMap.size()) return false;
+    if(y < 0 || y >= (int)tileMap[0].size()) return false;
 
     return isFlag(exploreMap[x][y], EX_SEEN);
 }
 
 bool Map::has_remembers(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return false;
-    if(y < 0 || y > (int)tileMap[0].size()) return false;
+    if(x < 0 || x >= (int)tileMap.size()) return false;
+    if(y < 0 || y >= (int)tileMap[0].size()) return false;
 
     return (isFlag(exploreMap[x][y], EX_HAS_SEEN) );
 }
 
 bool Map::has_passed(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return false;
-    if(y < 0 || y > (int)tileMap[0].size()) return false;
+    if(x < 0 || x >= (int)tileMap.size()) return false;
+    if(y < 0 || y >= (int)tileMap[0].size()) return false;
 
     return isFlag(exploreMap[x][y], EX_PASSED) ;
 }
@@ -389,40 +401,50 @@ bool Map::has_passed(int x, int y)
 
 void Map::setSeen(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return;
-    if(y < 0 || y > (int)tileMap[0].size()) return;
+    if(x < 0 || x >= (int)tileMap.size()) return;
+    if(y < 0 || y >= (int)tileMap[0].size()) return;
+
+    setRemember(x,y);
 
     setFlag(exploreMap[x][y], EX_SEEN);
 }
 
+void Map::remove_seens(int x, int y)
+{
+    if(x < 0 || x >= (int)tileMap.size()) return;
+    if(y < 0 || y >= (int)tileMap[0].size()) return;
+
+    removeFlag(exploreMap[x][y], EX_SEEN);
+}
+
 void Map::setRemember(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return;
-    if(y < 0 || y > (int)tileMap[0].size()) return;
+    if(x < 0 || x >= (int)tileMap.size()) return;
+    if(y < 0 || y >= (int)tileMap[0].size()) return;
 
     setFlag(exploreMap[x][y], EX_HAS_SEEN);
 }
 
 void Map::setPassed(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return;
-    if(y < 0 || y > (int)tileMap[0].size()) return;
+    if(x < 0 || x >= (int)tileMap.size()) return;
+    if(y < 0 || y >= (int)tileMap[0].size()) return;
 
     setFlag(exploreMap[x][y], EX_PASSED);
 }
 
 void Map::setVisible(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return;
-    if(y < 0 || y > (int)tileMap[0].size()) return;
+    if(x < 0 || x >= (int)tileMap.size()) return;
+    if(y < 0 || y >= (int)tileMap[0].size()) return;
 
     setFlag(exploreMap[x][y], EX_FOV);
 }
 
 void Map::setNotVisible(int x, int y)
 {
-    if(x < 0 || x > (int)tileMap.size()) return;
-    if(y < 0 || y > (int)tileMap[0].size()) return;
+    if(x < 0 || x >= (int)tileMap.size()) return;
+    if(y < 0 || y >= (int)tileMap[0].size()) return;
 
     removeFlag(exploreMap[x][y], EX_FOV);
 }

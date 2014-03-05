@@ -304,7 +304,7 @@ function autoExplore()
             
             --Se não estiver na lista de iterados
             if not values[c] then
-              if not map:has_seens(x, y) then
+              if not map:has_remembers(x, y) then
                 --Se não visto, coloca como escolha de exploração
 						    unseen_tiles[#unseen_tiles + 1] = c
 						    values[c] = iter
@@ -315,7 +315,7 @@ function autoExplore()
 						    local is_singlet = true
 						    local single_n = 1
 						    for _, anode in ipairs(listAdjacentTiles(x,y,false,false)) do
-							    if not map:has_seens(anode[1], anode[2]) then
+							    if not map:has_remembers(anode[1], anode[2]) then
 								    if single_n > 1 then -- Se tiver 2 tiles visiveis em volta, não é singlet 
 								      is_singlet = false
 								      break
@@ -330,7 +330,7 @@ function autoExplore()
 						    end
 						  else --Se já tile visto e não for bloco, propaga para proxima iteração
 					      --Se objeto for um item, adiciona a lista de itens
-                local obj = map:getObj(x, y, 0)
+                local obj = map:getItem(x, y, 0)
                 
 				        if obj then
 				          if obj.type == Obj.ITEM then
@@ -339,14 +339,18 @@ function autoExplore()
 					          if iter < minval_items then
 						          minval_items = iter
 					          end
-					        else --É um inimigo
-					          unseen_enemys[#unseen_enemys + 1] = c
-					          values[c] = iter
-					          if iter < minval_enemys then
-						          minval_enemys = iter
-					          end
-					        end --else
-				        end--if obj
+					        end
+					      end
+					      
+					      local obj = map:getObj(x,y)
+				        if obj then --É um inimigo
+				          unseen_enemys[#unseen_enemys + 1] = c
+				          values[c] = iter
+				          if iter < minval_enemys then
+					          minval_enemys = iter
+				          end
+				        end --end inimigo			
+				        
 				        
 				        if tile.id == Tile.FINISH then
 				          unseen_tiles[#unseen_tiles + 1] = c

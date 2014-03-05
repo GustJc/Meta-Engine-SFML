@@ -26,11 +26,11 @@ class Map
 
         void draw();
 
-        void createMap(int sizeW, int sizeH);
+        void createMap(int sizeW, int sizeH, int defaultType = 0, int defaultGfx = -1);
         bool loadMap(std::string filename);
         void saveMap(std::string filename = "output_map.map");
         void clearMap();
-        void setTile(int x, int y, int tileID, int tileColor);
+        void setTile(int x, int y, int tileGfx, int tileColor);
         Tile* getTile(int x, int y);
 
         void setSprite(sf::Texture& texture);
@@ -38,7 +38,8 @@ class Map
         int getMapWidth();
         int getMapHeight();
 
-        GameObject* getObj(int x, int y, int index);
+        GameObject* getObj(int x, int y);
+        GameObject* getItem(int x, int y, int index);
         GameObject* getIfObj(int x, int y, int typeObj);
 
         //Lua
@@ -54,6 +55,7 @@ class Map
         void setPassed(int x, int y);
         void setVisible(int x, int y);
         void setNotVisible(int x, int y);
+        void remove_seens(int x, int y);
 
         void forceRemoveMapFlag(int x, int y, int flag);
 

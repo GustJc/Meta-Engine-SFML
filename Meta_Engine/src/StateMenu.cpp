@@ -123,9 +123,9 @@ int StateMenu::unload()
     return mStack;
 }
 
-eStateType StateMenu::update(unsigned int dt)
+eStateType StateMenu::update(float dt)
 {
-    guiDesktop.Update(dt/1000.f);
+    guiDesktop.Update(dt);
 
 
     return mStado;

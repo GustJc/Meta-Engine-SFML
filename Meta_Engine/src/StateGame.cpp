@@ -192,7 +192,7 @@ void StateGame::events(sf::Event& event)
 }
 
 //---------------------------- Update ------------------------------------
-eStateType StateGame::update(unsigned int dt)
+eStateType StateGame::update(float dt)
 {
     if(mStado != GST_NONE) return mStado;
 
@@ -241,16 +241,27 @@ eStateType StateGame::update(unsigned int dt)
     if(Player::PlayerControl->mHasMoved)
     {
         DataHolder::RunData.steps++;
-        //Atualiza posição da camera
-        sf::View& view = MetaEngine::EngineControl.getViewGame();
-        view.setCenter(Player::PlayerControl->getPosition().x*TILE_SIZE-TILE_SIZE/4, Player::PlayerControl->getPosition().y*TILE_SIZE-TILE_SIZE/4);
-        window.setView(view);
         //Atualiza inimigos e itens
         for(unsigned int i = 0; i < ObjectList.size();++i)
         {
             ObjectList[i]->update(0, Player::PlayerControl->mSpeedCost);
         }
     }
+
+    if(g_animationsLeft)
+    {
+        //Atualiza posição da camera
+        sf::View& view = MetaEngine::EngineControl.getViewGame();
+        view.setCenter(Player::PlayerControl->getAnimationPosition().x*TILE_SIZE-TILE_SIZE/4.f, Player::PlayerControl->getAnimationPosition().y*TILE_SIZE-TILE_SIZE/4);
+        window.setView(view);
+        for(unsigned int i = 0; i < ObjectList.size();++i)
+        {
+            ObjectList[i]->update(dt, 0);
+        }
+    }
+
+    //Setado como true todo frame se houver animacoes
+    g_animationsLeft = false;
     return GST_NONE;
 }
 

@@ -11,5 +11,5 @@ using namespace std;
 extern int  TILE_SIZE;
 extern int MAP_WIDTH;
 extern int MAP_HEIGHT;
-
-
+extern float g_animationSpeed;
+extern bool g_animationsLeft;

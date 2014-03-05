@@ -12,19 +12,7 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
     //dtor
-
-    Tile* t = Map::MapControl.getTile(mPosition.x, mPosition.y);
-    if (t)
-    {
-        //Garante que não é deixado a referencia do objeto no tile ao deixar de existir
-        for(unsigned int i = 0; i < t->obj.size(); ++i)
-        {
-            if(t->obj[i] == this)
-            {
-                t->obj.erase(t->obj.begin()+ i);
-            }
-        }
-    }
+    removeFromTileReference();
 }
 
 
@@ -33,6 +21,10 @@ sf::Vector2i GameObject::getPosition()
     return mPosition;
 }
 
+sf::Vector2f GameObject::getAnimationPosition()
+{
+    return (anim.mPosition);
+}
 
 int GameObject::getPositionX()
 {
@@ -46,21 +38,22 @@ int GameObject::getPositionY()
 
 void GameObject::setPosition(int x, int y)
 {
-
-
-    Tile* tileOld = Map::MapControl.getTile(mPosition.x, mPosition.y);
     //Remove da lista de tiles
-    for(unsigned int i = 0; i < tileOld->obj.size(); ++i)
-    {
-        if(tileOld->obj[i] == this)
-        {
-            tileOld->obj.erase(tileOld->obj.begin()+i);
-        }
-    }
+    removeFromTileReference();
     //Move e adciona a lista de tiles
     mPosition.x = x;
     mPosition.y = y;
-    Map::MapControl.getTile(mPosition.x, mPosition.y)->obj.push_back(this);
+    anim.mPosition.x = x;
+    anim.mPosition.y = y;
+    if(this->type == TYPE_ITEM)
+    {
+        Map::MapControl.getTile(mPosition.x, mPosition.y)->itens.push_back(this);
+    } else
+    {
+        Map::MapControl.getTile(mPosition.x, mPosition.y)->obj = (this);
+    }
+
+
 }
 
 void GameObject::setPosition(sf::Vector2i pos)
@@ -70,20 +63,21 @@ void GameObject::setPosition(sf::Vector2i pos)
 
 void GameObject::movePositionIgnore(int x, int y)
 {
-    Tile* tileOld = Map::MapControl.getTile(mPosition.x, mPosition.y);
     //Remove da lista de tiles
-    for(unsigned int i = 0; i < tileOld->obj.size(); ++i)
-    {
-        if(tileOld->obj[i] == this)
-        {
-            tileOld->obj.erase(tileOld->obj.begin()+i);
-        }
-    }
+    removeFromTileReference();
     //Move e adciona a lista de tiles
 
     mPosition.x += x;
     mPosition.y += y;
-    Map::MapControl.getTile(mPosition.x, mPosition.y)->obj.push_back(this);
+    anim.mPosition.x += x;
+    anim.mPosition.y += y;
+    if(this->type == TYPE_ITEM)
+    {
+        Map::MapControl.getTile(mPosition.x, mPosition.y)->itens.push_back(this);
+    } else
+    {
+        Map::MapControl.getTile(mPosition.x, mPosition.y)->obj = (this);
+    }
 }
 
 
@@ -150,7 +144,7 @@ void GameObject::draw()
     else
     {
         //TODO: Move e setPosition mexe sprite.
-        mSprite.setPosition(mPosition.x*TILE_SIZE, mPosition.y*TILE_SIZE);
+        mSprite.setPosition(anim.getPosition().x*TILE_SIZE, anim.getPosition().y*TILE_SIZE);
         MetaEngine::EngineControl.getWindowReference().draw(mSprite);
     }
 }
@@ -180,16 +174,28 @@ void GameObject::removeFromObjectList()
     }
 }
 
-void GameObject::removeFromTileReference()
+void GameObject::removeFromTileReference(int pX, int pY)
 {
-    Tile* tileOld = Map::MapControl.getTile(mPosition.x, mPosition.y);
+    if(pX == -1 && pY == -1)
+    {
+        pX = mPosition.x;
+        pY = mPosition.y;
+    }
+    Tile* tileOld = Map::MapControl.getTile(pX, pY);
     if (!tileOld) return;
 
-    for(unsigned int i = 0; i < tileOld->obj.size(); ++i)
+    if(tileOld->obj == this)
     {
-        if(tileOld->obj[i] == this)
+        tileOld->obj = nullptr;
+        return;
+    }
+
+    for(unsigned int i = 0; i < tileOld->itens.size(); ++i)
+    {
+        if(tileOld->itens[i] == this)
         {
-            tileOld->obj.erase(tileOld->obj.begin()+i);
+            tileOld->itens.erase(tileOld->itens.begin()+i);
+            return;
         }
     }
 }

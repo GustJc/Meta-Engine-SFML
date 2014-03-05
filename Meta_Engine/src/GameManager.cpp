@@ -144,7 +144,7 @@ int GameManager::run(int argc, char* args[])
             }
             mEstadoAtual->events(event);
         }
-        unsigned int dt = tempoDecorrido.getElapsedTime().asMilliseconds();
+        float dt = tempoDecorrido.getElapsedTime().asSeconds();
         tempoDecorrido.restart();
         //Update
         switch(mEstadoAtual->update(dt )  )

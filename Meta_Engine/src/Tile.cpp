@@ -1,11 +1,12 @@
 #include "Tile.h"
 
-Tile::Tile()
+Tile::Tile(int defaultType, int defaultGfx)
 {
     //ctor
-    id = TILE_SOLID;
-    tipo = 0;
-    obj.clear();
+    gfx = defaultGfx;
+    tipo = defaultType;
+    itens.clear();
+    obj = nullptr;
 }
 
 Tile::~Tile()

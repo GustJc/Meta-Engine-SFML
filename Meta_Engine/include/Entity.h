@@ -12,7 +12,7 @@ class Entity : public GameObject
         virtual ~Entity();
 
         virtual void draw();
-        virtual void update(unsigned int dt, unsigned int delay);
+        virtual void update(float dt, unsigned int delay);
 
         virtual void movePosition(int x = 0, int y = 0);
         virtual void movePosition(int number);
@@ -31,10 +31,13 @@ class Entity : public GameObject
         void geraRota(int dx, int dy);
         bool isRota();
         void moveRota();
+
+        bool isMoving();
+        void stopMoving();
+
     protected:
+        bool moveAnimation(float dt);
         void runAI();
-
-
 
         class TileNode
         {

@@ -51,8 +51,9 @@ luabind::scope LuaManager::bindClasses()
 	   .property("h", &Map::getMapHeight)
 	   .property("w", &Map::getMapWidth)
 	   .def("forceShowMap", &Map::forceShowMap)
-	   .def("getIfObj", &Map::getObj)
+	   .def("getIfObj", &Map::getIfObj)
 	   .def("getObj", &Map::getObj)
+	   .def("getItem", &Map::getItem)
 	   .def("getTile", &Map::getTile)
 	   .def("setTile", &Map::setTile)
 	   .def("has_seens", &Map::has_seens)
@@ -66,7 +67,7 @@ luabind::scope LuaManager::bindClasses()
 
     luabind::class_<Tile>("Tile")
         .def( luabind::constructor<>( ) )
-        .def_readwrite("id", &Tile::id)
+        .def_readwrite("id", &Tile::gfx)
         .enum_("Tile_type")
         [
             luabind::value("FLOOR", TILE_FLOOR),
@@ -231,7 +232,7 @@ LuaManager::~LuaManager()
 
 void LuaManager::executeTests()
 {
-    Tile t; t.id = 1;
+    Tile t; t.gfx = 1;
 	luabind::globals(L)["tile"] = t;
 
 	sf::Vector2i v(1,2);

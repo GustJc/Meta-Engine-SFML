@@ -14,7 +14,7 @@ class Player : public Entity
         virtual ~Player();
 
         void draw();
-        void update(unsigned int dt = 0);
+        void update(float dt = 0);
         void events(sf::Event& event);
         void startController();
         void resetMoved();

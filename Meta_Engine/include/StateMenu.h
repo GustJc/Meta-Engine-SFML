@@ -7,7 +7,7 @@ class StateMenu : public State
         virtual ~StateMenu();
         void load(int stack = 0);
         int unload();
-        eStateType update(unsigned int dt);
+        eStateType update(float dt);
         void events(sf::Event& event);
         void render();
     protected:

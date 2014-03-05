@@ -80,7 +80,7 @@ void Entity::draw()
     GameObject::draw();
 }
 //----------------- Update --------------------------------------
-void Entity::update(unsigned int dt, unsigned int delay)
+void Entity::update(float dt, unsigned int delay)
 {
     if(mHP <= 0)
     {
@@ -90,6 +90,9 @@ void Entity::update(unsigned int dt, unsigned int delay)
 
         return;
     }
+
+    moveAnimation(dt);
+    anim.update(dt);
 
     //dt será usado para movimento smoth futuramente
     //Quando delay for mais que speed, realiza 1 movimento.
@@ -105,6 +108,43 @@ void Entity::update(unsigned int dt, unsigned int delay)
         }
     }
 
+}
+//----------------- Move Animation ------------------------------
+bool Entity::moveAnimation(float dt)
+{
+    if(g_animationSpeed == 0)
+    {
+        anim.mPosition.x = mPosition.x;
+        anim.mPosition.y = mPosition.y;
+    } else
+    {
+        sf::Vector2f direction = sf::Vector2f(mPosition) - anim.mPosition;
+        if( (direction.x >= -0.01f && direction.x <= 0.01f) &&
+            (direction.y >= -0.01f && direction.y <= 0.01f) ){
+                anim.mPosition = sf::Vector2f(mPosition);
+            }
+        else
+        {
+            if(direction.x > 0)
+                direction.x = 1;
+            else if(direction.x < 0)
+                direction.x = -1;
+            if(direction.y > 0)
+                direction.y = 1;
+            else if(direction.y < 0)
+                direction.y = -1;
+
+            direction *= dt;
+            direction *= (float)g_animationSpeed;
+            anim.mPosition  += direction;
+            g_animationsLeft = true;
+            moving = true;
+            return true;
+        }
+
+    }
+    moving = false;
+    return false;
 }
 //----------------- Run AI --------------------------------------
 void Entity::runAI()
@@ -124,64 +164,62 @@ void Entity::runAI()
 void Entity::movePosition(int px, int py)
 {
     if(px == 0 && py == 0) return;
+
+    if(g_animationSpeed)
+        anim.jumpAnimation();
+
     Tile* tile = Map::MapControl.getTile(mPosition.x + px, mPosition.y + py);
     //Se solido, ou se objeto no tile,  não anda.
-    if (tile == nullptr || tile->id == TILE_SOLID)
+    if (tile == nullptr || tile->tipo == TILE_SOLID)
     {
         ConsoleInfo::MessageControl.addMessage("Passagem bloqueada.");
         return;
-    } else //Se inimigo no tile.
-    for(unsigned int i = 0; i < tile->obj.size(); ++i)
-    {
-        if((type == TYPE_PLAYER && tile->obj[i]->type == TYPE_ENEMY) ||
-           (type == TYPE_ENEMY && tile->obj[i]->type == TYPE_PLAYER) )
-        {
-            Entity* ent = (Entity*)tile->obj[i];
-            //cout << "Atacando inimigo (" << mAtk << "-" << ent->mDef << ")\n";
+    } else //Se algo no tile.
+    if (tile->obj != nullptr) {
+        Entity* ent = (Entity*) tile->obj;
+        int dano = mAtk - ent->mDef;
 
-            int dano = mAtk - ent->mDef;
-            if(dano > 0){
-                ent->mHP-= dano;
-                if(ent->mHP < 0) ent->mHP = 0;
-            } else { dano = 0; }
-            if(tile->obj[i]->type == TYPE_ENEMY)
-            { //Se obj inimigo, player atacando... supostamente
-                std::stringstream stream;
-                stream << "Voce ataca inimigo com " << dano << " de dano!";
-                ConsoleInfo::MessageControl.addMessage( stream.str() );
-            } else
-            {
-                std::stringstream stream;
-                stream << "Inimigo te ataca com " << dano << " de dano!";
-                ConsoleInfo::MessageControl.addMessage( stream.str() );
-            }
-            //cout << "Dano: " << dano << " Defensor HP: " << ent->mHP << endl;
-            return;
-        }
-        else
-        if (tile->obj[i]->type == TYPE_ITEM && type == TYPE_PLAYER)
+        if( dano > 0) {
+            ent->mHP-= dano;
+            if(ent->mHP < 0) ent->mHP = 0;
+        } else { dano = 0; }
+
+// TODO (gust#1#): Tratar Inimigo atacar Inimigo ou colocar nomes nas entidades        //Se estiver atacando um inimigo
+        if(tile->obj->type == TYPE_ENEMY)
         {
-            Item* item = (Item*)tile->obj[i];
+            std::stringstream stream;
+            stream << "Voce ataca inimigo com  " << dano << " de dano! ";
+            ConsoleInfo::MessageControl.addMessage( stream.str() );
+        } else
+        {
+            std::stringstream stream;
+            stream << "Inimigo ataca voce com " << dano << " de dano! ";
+            std::cout <<  tile->obj->type << std::endl;
+            ConsoleInfo::MessageControl.addMessage( stream.str() );
+        }
+
+        return;
+    }
+    for(unsigned int i = 0; i < tile->itens.size(); ++i)
+    {
+        if (this->type == TYPE_PLAYER)
+        {
+            Item* item = (Item*)tile->itens[i];
 
             item->useItem();
-            --i; //Deleta tile, do vetor então i diminui
+            --i; //Deleta tile do vetor então i diminui
             DataHolder::RunData.itens_get++;
         }
     }
 
+    //Realiza movimento
     Tile* tileOld = Map::MapControl.getTile(mPosition.x, mPosition.y);
     //Remove da lista de tiles
-    for(unsigned int i = 0; i < tileOld->obj.size(); ++i)
-    {
-        if(tileOld->obj[i] == this)
-        {
-            tileOld->obj.erase(tileOld->obj.begin()+i);
-        }
-    }
+    tileOld->obj = nullptr;
     //Move e adciona a lista de tiles
     mPosition.x += px;
     mPosition.y += py;
-    tile->obj.push_back(this);
+    tile->obj = (this);
 }
 
 void Entity::movePosition(int number)
@@ -213,6 +251,15 @@ void Entity::movePosition(int number)
         movePosition(1,-1);
         break;
     }
+}
+
+bool Entity::isMoving()
+{
+    return moving;
+}
+void Entity::stopMoving()
+{
+    moving = false;
 }
 
 bool Entity::isRota()
@@ -376,7 +423,7 @@ Entity::TileNode::TileNode(int ix, int iy)
 {
     this->x = ix;
     this->y = iy;
-    this->id = Map::MapControl.getTile(x,y)->id;
+    this->id = Map::MapControl.getTile(x,y)->tipo;
     parent = nullptr;
 
     f = g = h = 0;

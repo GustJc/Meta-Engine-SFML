@@ -134,11 +134,11 @@ void Player::draw()
                                     sf::Vector2i(5,100+20*4)) );
     window.draw(txt);
 }
-void Player::update(unsigned int dt)
+void Player::update(float dt)
 {
     if(mDead) return;
 
-    if(MetaEngine::EngineControl.isEventsPaused()) return;
+    if(MetaEngine::EngineControl.isEventsPaused() && !moving) return;
 
     if(mHP <= 0)
     {
@@ -146,16 +146,23 @@ void Player::update(unsigned int dt)
         return;
     }
 
+    //Move animacao se necessario
+    if (moveAnimation(dt) ) {
+        MetaEngine::EngineControl.setEventsPaused(true);
+    } else {
+        MetaEngine::EngineControl.setEventsPaused(false);
+    }
+    anim.update(dt);
 
     Tile* tile = Map::MapControl.getTile(mPosition.x, mPosition.y);
-    if(tile->id == TILE_FINISH_LV)
+    if(tile->gfx == TILE_FINISH_LV)
     {
         mHasWon = true;
     }
 
     if(isBot)
     {
-        mDelay += dt;
+        mDelay += dt*1000.f;
         if(mDelay < mBotDelay) return;
 
         mDelay -= mBotDelay;
@@ -191,6 +198,10 @@ void Player::movePosition(int x, int y)
 
     Map::MapControl.setPassed(mPosition.x, mPosition.y);
 
+    for(int i = mPosition.x-10; i < mPosition.x+10; ++i)
+        for(int j = mPosition.y-10; j < mPosition.y+10; ++j)
+            Map::MapControl.remove_seens(i,j);
+
     for(int i = -mRange; i <= mRange; ++i)
     {
         for(int j = -mRange; j <= mRange; ++j)
@@ -209,16 +220,14 @@ void Player::movePosition(int x, int y)
             if(Map::MapControl.has_seens(kx,ky) == false)
             {
                 Map::MapControl.setSeen(kx, ky);
-                if(tile->id != TILE_SOLID && tile->id != TILE_NONE){
+                if(tile->gfx != TILE_SOLID && tile->gfx != TILE_NONE){
                     mHasNewTiles = true;
                 }
             }
 
-            for(unsigned int i = 0; i < tile->obj.size();++i)
-            {
-                if(tile->obj[i]->type == TYPE_ENEMY){
-                    mHasEnemys++;
-                }
+
+            if(tile->obj && tile->obj->type == TYPE_ENEMY){
+                mHasEnemys++;
             }
 
         }//End loop

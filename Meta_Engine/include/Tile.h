@@ -3,8 +3,8 @@
 class GameObject;
 enum {
     TILE_NONE = -1,
-    TILE_SOLID,
-    TILE_FLOOR,
+    TILE_SOLID = 0,
+    TILE_FLOOR = 1,
     TILE_FINISH_LV
 };
 enum {
@@ -15,11 +15,12 @@ enum {
 class Tile
 {
     public:
-        Tile();
+        Tile(int defaultType = TILE_SOLID, int defaultGfx = -1);
         virtual ~Tile();
 
-        int id;
-        std::vector<GameObject*> obj;
+        int gfx;
+        std::vector<GameObject*> itens;
+        GameObject* obj;
         int tipo;
     protected:
     private:

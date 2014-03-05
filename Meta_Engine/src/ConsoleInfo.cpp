@@ -147,6 +147,10 @@ void ConsoleInfo::events(const sf::Event& event)
     //Se eventos pausados, ignora teclas que não sejam console
         if(MetaEngine::EngineControl.isEventsPaused())
         {
+            if(Player::PlayerControl->isMoving()) {
+                setViewPortOnline(true); //Deixa abrir console no meio do movimento
+                Player::PlayerControl->stopMoving();
+            }
             return;
         } else
         if(event.key.code == sf::Keyboard::Space)
@@ -349,6 +353,20 @@ bool ConsoleInfo::executeCommand(std::string str)
                 int b;
                 is >> b;
                 Player::PlayerControl->mBotDelay = b;
+            }
+            return true;
+        } else
+        if(tokens[1].compare("animSpeed") == 0 || tokens[1].compare("animationSpeed") == 0)
+        {
+            if(tokens.size() <= 2)
+            {
+                mConsoleLog.push_back(sf::Text(std::string("Uso invalido, animationSpeed float"), MetaEngine::EngineControl.getFont(), 12));
+            } else
+            {
+                std::istringstream is(tokens[2]);
+                float b;
+                is >> b;
+                g_animationSpeed = b;
             }
             return true;
         }
