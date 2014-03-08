@@ -15,7 +15,7 @@ Player::Player()
 {
     //ctor
     resetPlayer();
-    mBotDelay = 400;
+    mBotDelay = 200;
 }
 
 void Player::resetPlayer()
@@ -43,7 +43,58 @@ Player::~Player()
 {
     //dtor
 }
-
+void Player::eventsFrame()
+{
+    if(MetaEngine::EngineControl.isEventsPaused()) return;
+    if(g_animationSpeed != 0) {
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
+        {
+            mHasMoved = true;
+            movePosition();
+        }else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            std::cout << "UP" << std::endl;
+            this->movePosition(0,-1);
+            mHasMoved = true;
+        } else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            this->movePosition(0,1);
+            mHasMoved = true;
+        } else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            this->movePosition(1,0);
+            mHasMoved = true;
+        } else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            this->movePosition(-1,0);
+            mHasMoved = true;
+        } else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+        {
+            this->movePosition(-1,1);
+            mHasMoved = true;
+        } else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+        {
+            this->movePosition(1,1);
+            mHasMoved = true;
+        } else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num7))
+        {
+            this->movePosition(-1,-1);
+            mHasMoved = true;
+        } else
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num9))
+        {
+            this->movePosition(1,-1);
+            mHasMoved = true;
+        }
+    }
+}
 void Player::events(sf::Event& event)
 {
     if(MetaEngine::EngineControl.isEventsPaused()) return;

@@ -147,8 +147,9 @@ void ConsoleInfo::events(const sf::Event& event)
     //Se eventos pausados, ignora teclas que não sejam console
         if(MetaEngine::EngineControl.isEventsPaused())
         {
-            if(Player::PlayerControl->isMoving()) {
-                setViewPortOnline(true); //Deixa abrir console no meio do movimento
+            //Deixa abrir console no meio do movimento
+            if(Player::PlayerControl->isMoving() && event.key.code == sf::Keyboard::SemiColon) {
+                setViewPortOnline(true);
                 Player::PlayerControl->stopMoving();
             }
             return;
@@ -353,6 +354,18 @@ bool ConsoleInfo::executeCommand(std::string str)
                 int b;
                 is >> b;
                 Player::PlayerControl->mBotDelay = b;
+                if(b < 200) {
+                    g_animationSpeed = 0;
+                } else
+                if(b < 300) {
+                    g_animationSpeed = 5.f;
+                } else if(b < 800) {
+                    g_animationSpeed = 4.f;
+                } else if (b < 1200) {
+                    g_animationSpeed = 3.f;
+                } else if (b < 2000) {
+                    g_animationSpeed = 2.f;
+                }
             }
             return true;
         } else
@@ -368,6 +381,12 @@ bool ConsoleInfo::executeCommand(std::string str)
                 is >> b;
                 g_animationSpeed = b;
             }
+            return true;
+        } else
+        if(tokens[1].compare("list") == 0 || tokens[1].compare("cmd") == 0)
+        {
+            mConsoleLog.push_back(sf::Text(std::string("Comandos: animSpeed, botDelay, enableBot/disableBot, setFog, return, exit"), MetaEngine::EngineControl.getFont(), 12));
+
             return true;
         }
 

@@ -260,6 +260,7 @@ eStateType StateGame::update(float dt)
         }
     }
 
+    Player::PlayerControl->eventsFrame();
     //Setado como true todo frame se houver animacoes
     g_animationsLeft = false;
     return GST_NONE;

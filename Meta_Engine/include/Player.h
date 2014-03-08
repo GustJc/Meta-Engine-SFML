@@ -16,6 +16,7 @@ class Player : public Entity
         void draw();
         void update(float dt = 0);
         void events(sf::Event& event);
+        void eventsFrame();
         void startController();
         void resetMoved();
         void resetPlayer();

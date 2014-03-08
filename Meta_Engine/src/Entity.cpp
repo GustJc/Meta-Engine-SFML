@@ -119,8 +119,8 @@ bool Entity::moveAnimation(float dt)
     } else
     {
         sf::Vector2f direction = sf::Vector2f(mPosition) - anim.mPosition;
-        if( (direction.x >= -0.01f && direction.x <= 0.01f) &&
-            (direction.y >= -0.01f && direction.y <= 0.01f) ){
+        if( (direction.x >= -g_animationSpeed*dt && direction.x <= g_animationSpeed*dt) &&
+            (direction.y >= -g_animationSpeed*dt && direction.y <= g_animationSpeed*dt) ){
                 anim.mPosition = sf::Vector2f(mPosition);
             }
         else
