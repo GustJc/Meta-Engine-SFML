@@ -46,15 +46,13 @@ Player::~Player()
 void Player::eventsFrame()
 {
     if(MetaEngine::EngineControl.isEventsPaused()) return;
-    if(g_animationSpeed != 0) {
+    if(g_animationSpeed != 0 && !anim.isJumping()) {
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
         {
             mHasMoved = true;
-            movePosition();
         }else
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            std::cout << "UP" << std::endl;
             this->movePosition(0,-1);
             mHasMoved = true;
         } else

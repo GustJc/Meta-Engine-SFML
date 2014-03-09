@@ -23,6 +23,8 @@ class Animation
 
         void jumpAnimation();
 
+        bool isJumping();
+
         void update(float dt);
 
     protected:

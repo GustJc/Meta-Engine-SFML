@@ -22,7 +22,7 @@ void Animation::update(float dt)
         float timeSpeed = 180.f*g_animationSpeed;
         timeSpeed *= dt;
         degree += timeSpeed;
-        mPositionOffset.y = -sin(degree * 3.14f/180.f)*0.25f; //Pula 1/4 do quadrado
+        mPositionOffset.y = -sin(degree * 3.14f/180.f)*0.1; //Pula 1/10 do quadrado
 
         g_animationsLeft = true;
 
@@ -41,4 +41,9 @@ sf::Vector2f Animation::getPosition()
 void Animation::jumpAnimation()
 {
     jumping = true;
+}
+
+bool Animation::isJumping()
+{
+    return jumping;
 }
