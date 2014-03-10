@@ -19,8 +19,10 @@ class ResourceManager
 
         Item* createItem(std::string nome);
         Item* getItem(std::string nome);
+        Item* getItemByIndex(int ID);
         Entity* createEntity(std::string nome);
         Entity* getEntity(std::string nome);
+        Entity* getEntityByIndex(int ID);
 
         void addItem(int mapX, int mapY, std::string ID);
         void addEntity(int mapX, int mapY, std::string ID);
@@ -28,6 +30,10 @@ class ResourceManager
 
         std::string addEntityByIndex(int mapX, int mapY, int ID);
         std::string addItemByIndex(int mapX, int mapY, int ID);
+
+        void addCustomEntity(int mapX, int mapY, Entity* ent);
+        void clearEntityMap();
+        void clearItemMap();
     protected:
 
         std::map< std::string, Item>      mItemMap;

@@ -33,7 +33,7 @@ void LuaManager::startLua()
     luabind::globals(L)["player"] =
         Player::PlayerControl;
 
-    luabind::globals(L)["resources"] =
+    luabind::globals(L)["res"] =
         &ResourceManager::ResourceControl;
 
     //executeTests();
@@ -138,7 +138,17 @@ luabind::scope LuaManager::bindClasses()
         .def( "createItem", &ResourceManager::createItem)
         .def( "createEntity", &ResourceManager::createEntity)
         .def( "getItem", &ResourceManager::getItem)
-        .def( "getEntity", &ResourceManager::getEntity),
+        .def( "getEntity", &ResourceManager::getEntity)
+        .def( "getEntityByIndex", &ResourceManager::getEntityByIndex)
+        .def( "getItemByIndex", &ResourceManager::createItem)
+        .def( "addGold", &ResourceManager::addGold)
+        .def( "addEntityByIndex", &ResourceManager::addEntityByIndex)
+        .def( "addItemByIndex", &ResourceManager::addItemByIndex)
+        .def( "addEntity", &ResourceManager::addEntity)
+        .def( "addItem", &ResourceManager::addItem)
+        .def( "addCustomEntity", &ResourceManager::addCustomEntity)
+        .def( "clearEntityMap", &ResourceManager::clearEntityMap)
+        .def( "clearItemMap", &ResourceManager::clearEntityMap),
 
     luabind::class_<std::string>("stdString")
         .def( luabind::constructor<>( ) )
