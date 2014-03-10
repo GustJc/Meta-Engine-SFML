@@ -352,7 +352,7 @@ function autoExplore()
 				        end --end inimigo			
 				        
 				        
-				        if tile.id == Tile.FINISH then
+				        if tile.id == Tile.END then
 				          unseen_tiles[#unseen_tiles + 1] = c
 					        values[c] = iter
 					        if iter < minval then
@@ -432,7 +432,7 @@ function autoExplore()
 		    end
         
         local tile = map:getTile(x,y)
-        if tile.id == Tile.FINISH then
+        if tile.id == Tile.END then
           priorityChoise[#priorityChoise + 1] = c
         end
 		  end -- for Tiles

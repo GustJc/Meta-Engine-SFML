@@ -204,7 +204,7 @@ void Player::update(float dt)
     anim.update(dt);
 
     Tile* tile = Map::MapControl.getTile(mPosition.x, mPosition.y);
-    if(tile->gfx == TILE_FINISH_LV)
+    if(tile->tipo == TILE_FINISH_LV)
     {
         mHasWon = true;
     }
@@ -238,9 +238,9 @@ void Player::resetMoved()
 
 
 //-------------- Move ---------------------//
-void Player::movePosition(int x, int y)
+bool Player::movePosition(int x, int y)
 {
-    Entity::movePosition(x,y);
+    bool retorno = Entity::movePosition(x,y);
 
     mHasNewTiles = false;
     mHasEnemys = 0;
@@ -269,7 +269,7 @@ void Player::movePosition(int x, int y)
             if(Map::MapControl.has_seens(kx,ky) == false)
             {
                 Map::MapControl.setSeen(kx, ky);
-                if(tile->gfx != TILE_SOLID && tile->gfx != TILE_NONE){
+                if(tile->tipo != TILE_SOLID && tile->tipo != TILE_NONE){
                     mHasNewTiles = true;
                 }
             }
@@ -282,6 +282,7 @@ void Player::movePosition(int x, int y)
         }//End loop
     }//End Loop
 
+    return retorno;
 }
 
 

@@ -36,6 +36,25 @@ Item* ResourceManager::getItem(std::string nome)
     return &found->second;
 }
 
+Item* ResourceManager::getItemByIndex(int ID)
+{
+    int i = 0;
+    for (auto &any : mItemMap ) {
+        Item* item = &any.second;
+
+        if(!item)
+        {
+            return nullptr;
+        }
+        if(i == ID)
+        {
+            return item;
+        }
+        i++;
+    }
+    return nullptr;
+}
+
 Entity* ResourceManager::getEntity(std::string nome)
 {
     auto found = mEntityMap.find(nome);
@@ -56,6 +75,25 @@ Entity* ResourceManager::createEntity(std::string nome)
     assert(inserted.second);
 
     return getEntity(nome);
+}
+
+Entity* ResourceManager::getEntityByIndex(int ID)
+{
+    int i = 0;
+    for (auto &any : mEntityMap ) {
+        Entity* ent = &any.second;
+
+        if(!ent)
+        {
+            return nullptr;
+        }
+        if(i == ID)
+        {
+            return ent;
+        }
+        i++;
+    }
+    return nullptr;
 }
 
 //-----------------------------------------------------------------------
@@ -131,3 +169,16 @@ std::string ResourceManager::addItemByIndex(int mapX, int mapY, int ID)
     return "not found";
 }
 
+void ResourceManager::addCustomEntity(int mapX, int mapY, Entity* ent)
+{
+    ent->addToObjectList();
+    ent->setPosition(mapX, mapY);
+}
+void ResourceManager::clearEntityMap()
+{
+    mEntityMap.clear();
+}
+void ResourceManager::clearItemMap()
+{
+    mItemMap.clear();
+}

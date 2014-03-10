@@ -334,11 +334,11 @@ bool ConsoleInfo::executeCommand(std::string str)
             return true;
         }
         else
-        if(tokens[1].compare("exit") == 0 || tokens[1].compare("quit") == 0)
+        if(tokens[1].compare("exit") == 0 || tokens[1].compare("quit") == 0 || tokens[1].compare("q!") == 0)
         {
             exit(0);
         } else
-        if(tokens[1].compare("return") == 0 || tokens[1].compare("menu") == 0)
+        if(tokens[1].compare("return") == 0 || tokens[1].compare("menu") == 0 || tokens[1].compare("wq") == 0)
         {
             mReturn = true;
             return true;
