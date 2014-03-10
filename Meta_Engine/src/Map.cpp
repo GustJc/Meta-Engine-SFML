@@ -33,7 +33,7 @@ void Map::createMap(int sizeW, int sizeH, int defaultType, int defaultGfx)
 
     for(int i = 0; i < sizeW; ++i)
     {
-        tileMap[i].resize(sizeH, Tile());
+        tileMap[i].resize(sizeH, Tile(defaultType, defaultGfx));
     }
     for(int i = 0; i < sizeW; ++i)
     {
@@ -248,6 +248,7 @@ void Map::draw()
 
             if(mSprite.getTexture() == nullptr)
             {
+                cout << "nullptr'\n";
                 //Se player não ve, no renderiza.
                 if(tile.tipo == 0) {
                     MetaEngine::EngineControl.drawRectVertex(i*TILE_SIZE,j*TILE_SIZE,
@@ -270,8 +271,8 @@ void Map::draw()
             } // Fim sem sprite
             else
             {
-                int tileImg = tile.tipo;
-                if(tileImg == 0) continue;
+                int tilesetWidth = mSprite.getTexture()->getSize().x;
+                if(tile.gfx < 0) continue;
 
                 int alpha = 255;
                 if(isFlag(exploreMap[i][j], EX_HAS_SEEN) && !isFlag(exploreMap[i][j], EX_SEEN) ) {
@@ -279,7 +280,7 @@ void Map::draw()
                 }
                 mSprite.setColor(sf::Color(255, 255, 255, alpha));
                 mSprite.setPosition(i*TILE_SIZE, j*TILE_SIZE);
-                mSprite.setTextureRect(sf::IntRect(tileImg*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+                mSprite.setTextureRect(sf::IntRect( (tile.gfx*TILE_SIZE)%tilesetWidth, (tile.gfx*TILE_SIZE)/tilesetWidth, TILE_SIZE, TILE_SIZE));
                 MetaEngine::EngineControl.getWindowReference().draw(mSprite);
             }
         } // fim for
@@ -287,7 +288,7 @@ void Map::draw()
 }
 
 
-void Map::setTile(int x, int y, int tileGfx, int tileColor)
+void Map::setTile(int x, int y, int tileGfx, int tileType)
 {
     if(tileMap.empty())
     {
@@ -302,7 +303,7 @@ void Map::setTile(int x, int y, int tileGfx, int tileColor)
     if(tileGfx >=0){
         tileMap[x][y].gfx = tileGfx;
     }
-    tileMap[x][y].tipo = tileColor;
+    tileMap[x][y].tipo = tileType;
 }
 
 Tile* Map::getTile(int x, int y)

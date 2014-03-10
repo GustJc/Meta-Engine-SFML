@@ -1,10 +1,13 @@
 #pragma once
 #include "Map.h"
+#include <string>
 class Procedural
 {
     public:
         Procedural();
         virtual ~Procedural();
+
+        std::string currentMap;
 
         static Procedural ProceduralControl;
 

@@ -14,7 +14,7 @@ class Entity : public GameObject
         virtual void draw();
         virtual void update(float dt, unsigned int delay);
 
-        virtual void movePosition(int x = 0, int y = 0);
+        virtual bool movePosition(int x = 0, int y = 0);
         virtual void movePosition(int number);
     //futuro protected
         double mSpeedCost;
@@ -30,7 +30,7 @@ class Entity : public GameObject
         sf::Vector2i getRotaTarget();
         void geraRota(int dx, int dy);
         bool isRota();
-        void moveRota();
+        bool moveRota();
 
         bool isMoving();
         void stopMoving();

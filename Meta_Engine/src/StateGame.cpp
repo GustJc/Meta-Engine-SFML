@@ -9,6 +9,7 @@
 #include "Item.h"
 #include "Defines.h"
 #include "Procedural.h"
+#include "LuaManager.h"
 #include "DataHolder.h"
 
 #include <sstream>
@@ -119,11 +120,12 @@ void StateGame::load(int stack)
 void StateGame::createNewMap()
 {
     Map& myMap = Map::MapControl;
-    myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
+    //myMap.createMap(MAP_WIDTH,MAP_HEIGHT);
 
     switch(Procedural::ProceduralControl.mapType){
     case 0:
-        Procedural::ProceduralControl.makeMap(myMap);
+        //Procedural::ProceduralControl.makeMap(myMap);
+        LuaManager::LuaControl.doFile(Procedural::ProceduralControl.currentMap.c_str());
         break;
     case 1:
         Procedural::ProceduralControl.makeMapMiner(myMap);
