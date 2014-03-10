@@ -238,9 +238,9 @@ void Player::resetMoved()
 
 
 //-------------- Move ---------------------//
-void Player::movePosition(int x, int y)
+bool Player::movePosition(int x, int y)
 {
-    Entity::movePosition(x,y);
+    bool retorno = Entity::movePosition(x,y);
 
     mHasNewTiles = false;
     mHasEnemys = 0;
@@ -282,6 +282,7 @@ void Player::movePosition(int x, int y)
         }//End loop
     }//End Loop
 
+    return retorno;
 }
 
 

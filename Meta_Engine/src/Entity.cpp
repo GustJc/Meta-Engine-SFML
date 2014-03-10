@@ -161,9 +161,9 @@ void Entity::runAI()
     movePosition(RotaList[last].x - mPosition.x, RotaList[last].y - mPosition.y);
 }
 //----------------- movePosition --------------------------------------
-void Entity::movePosition(int px, int py)
+bool Entity::movePosition(int px, int py)
 {
-    if(px == 0 && py == 0) return;
+    if(px == 0 && py == 0) return false;
 
     if(g_animationSpeed)
         anim.jumpAnimation();
@@ -173,7 +173,7 @@ void Entity::movePosition(int px, int py)
     if (tile == nullptr || tile->tipo == TILE_SOLID)
     {
         ConsoleInfo::MessageControl.addMessage("Passagem bloqueada.");
-        return;
+        return false;
     } else //Se algo no tile.
     if (tile->obj != nullptr) {
         Entity* ent = (Entity*) tile->obj;
@@ -198,7 +198,7 @@ void Entity::movePosition(int px, int py)
             ConsoleInfo::MessageControl.addMessage( stream.str() );
         }
 
-        return;
+        return false;
     }
     for(unsigned int i = 0; i < tile->itens.size(); ++i)
     {
@@ -220,6 +220,7 @@ void Entity::movePosition(int px, int py)
     mPosition.x += px;
     mPosition.y += py;
     tile->obj = (this);
+    return true;
 }
 
 void Entity::movePosition(int number)
@@ -267,14 +268,17 @@ bool Entity::isRota()
     return (RotaList.empty() == false);
 }
 
-void Entity::moveRota()
+bool Entity::moveRota()
 {
-    if (RotaList.empty()) return;
+    if (RotaList.empty()) return false;
 
     int last = RotaList.size()-1;
-    movePosition(RotaList[last].x - mPosition.x, RotaList[last].y - mPosition.y);
-
-    RotaList.erase(RotaList.end());
+    if ( movePosition(RotaList[last].x - mPosition.x, RotaList[last].y - mPosition.y) )
+    {
+        RotaList.erase(RotaList.end());
+        return true;
+    }
+    return false;
 }
 
 //----------------- Get Route --------------------------------------

@@ -21,7 +21,7 @@ class Player : public Entity
         void resetMoved();
         void resetPlayer();
 
-        virtual void movePosition(int x = 0, int y = 0);
+        virtual bool movePosition(int x = 0, int y = 0);
 
         static Player* PlayerControl;
 
