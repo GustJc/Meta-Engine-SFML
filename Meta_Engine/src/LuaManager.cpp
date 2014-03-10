@@ -16,6 +16,17 @@ using namespace std;
 LuaManager LuaManager::LuaControl;
 
 
+//Compactability function, should do nothing
+static int lua_sleep(lua_State *L)
+{
+    //int m = static_cast<int> (luaL_checknumber(L,1));
+
+    //sf::Time t = sf::milliseconds(m);
+    //sf::sleep(t);
+
+    return 0;
+}
+
 // ------------ Start Lua --------------------
 void LuaManager::startLua()
 {
@@ -36,11 +47,15 @@ void LuaManager::startLua()
     luabind::globals(L)["res"] =
         &ResourceManager::ResourceControl;
 
+    lua_pushcfunction(L, lua_sleep);
+    lua_setglobal(L, "sleep");
+
     //executeTests();
 
     doFile("./data/scripts/itens.lua");
     doFile("./data/scripts/entitys.lua");
-
+//luabind::call_function<int>(myLuaState, "testadd", 2, 3);
+//function
 }
 
 luabind::scope LuaManager::bindClasses()
@@ -63,17 +78,20 @@ luabind::scope LuaManager::bindClasses()
 	   .def("setRemember", &Map::setRemember)
 	   .def("setPassed", &Map::setPassed)
 	   .def("setNotVisible", &Map::setNotVisible)
-	   .def("setVisible", &Map::setVisible),
+	   .def("setVisible", &Map::setVisible)
+	   .def("createMap", &Map::createMap),
 
     luabind::class_<Tile>("Tile")
         .def( luabind::constructor<>( ) )
         .def_readwrite("id", &Tile::gfx)
         .enum_("Tile_type")
         [
-            luabind::value("FLOOR", TILE_FLOOR),
-            luabind::value("FINISH", TILE_FINISH_LV),
-            luabind::value("CHEST", TILE_OBJ_CHEST),
-            luabind::value("WALL", TILE_SOLID)
+            luabind::value("NONE", TILE_NONE),
+            luabind::value("BLOCK", TILE_SOLID),
+            luabind::value("PASS", TILE_FLOOR),
+            luabind::value("START", TILE_START_LV),
+            luabind::value("END", TILE_FINISH_LV),
+            luabind::value("CHEST", TILE_OBJ_CHEST)
         ],
 
     luabind::class_<sf::Vector2i>("Vector2i")

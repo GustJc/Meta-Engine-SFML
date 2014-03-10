@@ -5,7 +5,9 @@ enum {
     TILE_NONE = -1,
     TILE_SOLID = 0,
     TILE_FLOOR = 1,
-    TILE_FINISH_LV
+
+    TILE_FINISH_LV,
+    TILE_START_LV
 };
 enum {
     TILE_OBJ_ENTITY,

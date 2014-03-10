@@ -23,6 +23,8 @@ Procedural::Procedural()
     vida_max = 30;
     chance_spawn = 500;
     total_life = 5000;
+
+    currentMap = "./data/scripts/map/simpleRooms.lua";
 }
 
 Procedural::~Procedural()
@@ -223,13 +225,13 @@ void Procedural::makeMapMiner(Map& mMap)
                 }
                 tile = mMap.getTile(m_x, m_y);
                 //Se for solido, pode cavar
-                if(tile != nullptr && tile->gfx == TILE_SOLID) {
+                if(tile != nullptr && tile->tipo == TILE_SOLID) {
                     checking_pos = false;
                 }
 
             }
 
-            if(tile != nullptr && tile->gfx == TILE_SOLID){
+            if(tile != nullptr && tile->tipo == TILE_SOLID){
                 mMap.setTile(m_x,m_y,TILE_FLOOR,3);
                 life--;
                 mMiner[i].x = m_x;

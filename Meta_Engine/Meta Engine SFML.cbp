@@ -145,7 +145,7 @@
 			<Option virtualFolder="Stados/" />
 		</Unit>
 		<Unit filename="src/StateMenu.cpp">
-			<Option virtualFolder="Stados/" />
+			<Option virtualFolder="Main/" />
 		</Unit>
 		<Unit filename="src/TextureManager.cpp">
 			<Option virtualFolder="Engine/" />

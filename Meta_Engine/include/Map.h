@@ -30,7 +30,7 @@ class Map
         bool loadMap(std::string filename);
         void saveMap(std::string filename = "output_map.map");
         void clearMap();
-        void setTile(int x, int y, int tileGfx, int tileColor);
+        void setTile(int x, int y, int tileGfx, int tileType);
         Tile* getTile(int x, int y);
 
         void setSprite(sf::Texture& texture);
