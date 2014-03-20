@@ -5,9 +5,9 @@
 #include <SFML/Graphics/Sprite.hpp>
 
 enum {
-        EX_SEEN     =     0x0001,
-        EX_PASSED   =     0x0002,
-        EX_HAS_SEEN =     0x0004,
+        EX_SEEN     =     0x0001, // Saw the tite at at least once
+        EX_PASSED   =     0x0002, // Has passed throught the tile
+        EX_HAS_SEEN =     0x0004, // Has tile visibility
         EX_FOV      =     0x0008,
         EX_PLACE3   =     0x0010,
         EX_PLACE4   =     0x0020,

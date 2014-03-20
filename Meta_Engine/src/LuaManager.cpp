@@ -83,7 +83,8 @@ luabind::scope LuaManager::bindClasses()
 
     luabind::class_<Tile>("Tile")
         .def( luabind::constructor<>( ) )
-        .def_readwrite("id", &Tile::gfx)
+        .def_readwrite("gfx", &Tile::gfx)
+        .def_readwrite("type", &Tile::tipo)
         .enum_("Tile_type")
         [
             luabind::value("NONE", TILE_NONE),

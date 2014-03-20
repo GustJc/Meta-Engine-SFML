@@ -186,7 +186,7 @@ local adjacentTiles = {
 function isOpenTiles(target_x, target_y)
   --print("doing " .. target_x ..','..target_y)
   local tile = map:getTile(target_x,target_y)
-  if openTiles[target_x+1][target_y+1] == false and tile.id > 0  then
+  if openTiles[target_x+1][target_y+1] == false and tile.type > 0  then
     openTiles[target_x+1][target_y+1] = true
     return true
   end
@@ -294,12 +294,13 @@ function autoExplore()
              print('2000 PLUS')
              break 
             end
-            
             local tile = map:getTile(x,y)    
             if map:has_seens(x,y) then
-              ----map:setTile(x,y,-1,5)
+              -- map:setTile(x,y,5,-1)
+              -- showDelay(100)
             else
-              ----map:setTile(x,y,-1,6)
+              -- map:setTile(x,y,6,-1)
+              -- showDelay(100)
             end
             
             --Se não estiver na lista de iterados
@@ -352,14 +353,14 @@ function autoExplore()
 				        end --end inimigo			
 				        
 				        
-				        if tile.id == Tile.END then
+				        if tile.type == Tile.END then
 				          unseen_tiles[#unseen_tiles + 1] = c
 					        values[c] = iter
 					        if iter < minval then
 						        minval = iter
 					        end
 				        end
-						    if tile.id ~= 0 then
+						    if tile.type ~= 0 then
                   current_tiles_next[#current_tiles_next+1] = node
                 end
                 
@@ -432,7 +433,7 @@ function autoExplore()
 		    end
         
         local tile = map:getTile(x,y)
-        if tile.id == Tile.END then
+        if tile.type == Tile.END then
           priorityChoise[#priorityChoise + 1] = c
         end
 		  end -- for Tiles
@@ -480,7 +481,7 @@ function autoExploreOld()
       local tile = map:getTile(node[1], node[2])
       -- Se puder andar no tile, puder ver, e não tiver passado
       
-      if tile.id ~= 0 and map:has_seens(node[1], node[2]) and map:has_passed(node[1], node[2]) == false then 
+      if tile.type ~= 0 and map:has_seens(node[1], node[2]) and map:has_passed(node[1], node[2]) == false then 
         print('movendo ' .. node[1] .. ',' .. node[2] .. ' para ' .. node[3])
         player:move(node[3])
         moved = true
