@@ -8,6 +8,7 @@
 #include "LuaManager.h"
 #include <string>
 #include <sstream>
+#include <cmath>
 
 Player* Player::PlayerControl = nullptr;
 
@@ -251,6 +252,11 @@ bool Player::movePosition(int x, int y)
         for(int j = mPosition.y-10; j < mPosition.y+10; ++j)
             Map::MapControl.remove_seens(i,j);
 
+
+    FOV();
+
+
+    /*
     for(int i = -mRange; i <= mRange; ++i)
     {
         for(int j = -mRange; j <= mRange; ++j)
@@ -281,8 +287,37 @@ bool Player::movePosition(int x, int y)
 
         }//End loop
     }//End Loop
-
+    */
     return retorno;
 }
 
-
+void Player::FOV()
+{
+    float x;
+    float y;
+    for(int i = 0; i < 360; i+=5)
+    {
+        x=cos((float)i*0.01745f);
+        y=sin((float)i*0.01745f);
+        doFOV(x,y);
+    }
+}
+void Player::doFOV(float x, float y)
+{
+    float ox, oy;
+    ox = (float) this->getPositionX()+0.5f;
+    oy = (float) this->getPositionY()+0.5f;
+    for(int i = 0; i < this->mRange; ++i)
+    {
+        if(Map::MapControl.has_seens((int)ox, (int)oy) == false){
+            mHasNewTiles = true;
+            Map::MapControl.setSeen((int)ox, (int)oy);
+        }
+        Tile* tile = Map::MapControl.getTile((int)ox, (int)oy);
+        if(!tile || tile->tipo == TILE_SOLID){
+            return;
+        }
+        ox+=x;
+        oy+=y;
+    }
+}

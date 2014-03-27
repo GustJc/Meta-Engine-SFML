@@ -38,4 +38,6 @@ class Player : public Entity
 
         int mDelay;
     private:
+        void FOV();
+        void doFOV(float x, float y);
 };

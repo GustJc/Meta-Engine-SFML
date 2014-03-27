@@ -272,7 +272,11 @@ void Map::draw()
             else
             {
                 int tilesetWidth = mSprite.getTexture()->getSize().x;
-                if(tile.gfx < 0) continue;
+                if(tile.gfx < 0) {
+                    MetaEngine::EngineControl.drawRectVertex(i*TILE_SIZE,j*TILE_SIZE,
+                                               TILE_SIZE,TILE_SIZE,sf::Color(35,35,35));
+                    continue;
+                }
 
                 int alpha = 255;
                 if(isFlag(exploreMap[i][j], EX_HAS_SEEN) && !isFlag(exploreMap[i][j], EX_SEEN) ) {

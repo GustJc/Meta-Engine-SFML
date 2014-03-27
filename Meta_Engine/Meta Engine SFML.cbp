@@ -5,7 +5,7 @@
 		<Option title="Meta Engine SFML" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Engine/Game/;Engine/;Engine/Game/Map/;Main/;Stados/;Procedural/;Stados/Base/;" />
+		<Option virtualFolders="Stados/Main/;Stados/;Stados/Base/;Engine/Game/;Engine/;Engine/Game/Map/;Procedural/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="Meta_Engine_SFML" prefix_auto="1" extension_auto="1" />
@@ -46,7 +46,7 @@
 			<Option virtualFolder="Engine/Game/Map/" />
 		</Unit>
 		<Unit filename="include/Defines.h">
-			<Option virtualFolder="Main/" />
+			<Option virtualFolder="Stados/Main/" />
 		</Unit>
 		<Unit filename="include/Entity.h">
 			<Option virtualFolder="Engine/Game/" />
@@ -103,7 +103,7 @@
 			<Option virtualFolder="Engine/Game/Map/" />
 		</Unit>
 		<Unit filename="src/Defines.cpp">
-			<Option virtualFolder="Main/" />
+			<Option virtualFolder="Stados/Main/" />
 		</Unit>
 		<Unit filename="src/Entity.cpp">
 			<Option virtualFolder="Engine/Game/" />
@@ -121,7 +121,7 @@
 			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="src/Main.cpp">
-			<Option virtualFolder="Main/" />
+			<Option virtualFolder="Stados/Main/" />
 		</Unit>
 		<Unit filename="src/Map.cpp">
 			<Option virtualFolder="Engine/Game/Map/" />
@@ -130,7 +130,7 @@
 			<Option virtualFolder="Engine/" />
 		</Unit>
 		<Unit filename="src/Player.cpp">
-			<Option virtualFolder="Engine/Game/" />
+			<Option virtualFolder="Engine/Game/Map/" />
 		</Unit>
 		<Unit filename="src/Procedural.cpp">
 			<Option virtualFolder="Procedural/" />
@@ -145,7 +145,7 @@
 			<Option virtualFolder="Stados/" />
 		</Unit>
 		<Unit filename="src/StateMenu.cpp">
-			<Option virtualFolder="Main/" />
+			<Option virtualFolder="Stados/Main/" />
 		</Unit>
 		<Unit filename="src/TextureManager.cpp">
 			<Option virtualFolder="Engine/" />

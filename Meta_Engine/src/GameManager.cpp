@@ -199,7 +199,7 @@ int GameManager::run(int argc, char* args[])
         if(!mEstadoAtual) break;
 
         //Limpa a tela
-        window.clear();
+        window.clear(sf::Color(10,10,10));
 
 
         //Desenha
